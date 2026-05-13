@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -191,7 +190,7 @@ async function go() {
       content.push({type:'image',source:{type:'base64',media_type:files[i].type,data:b64}});
     }
     var cname = document.getElementById('cname').value.trim() || 'Valued Client';
-    content.push({type:'text',text:'Extract financial data from these ClearOne Advantage screenshots for client: '+cname+'. Return ONLY valid JSON with these fields: {"clientName":"","currentBalance":"","currentInterest":"","currentPayments":"","currentPathMonths":"","interestPaid":"","eligibleDebt":"","totalPayoff":"","debtConsolidation":"","creditCounseling":"","minimumPayments":"","activeCredit":"","remainingCredit":"","accounts":[{"creditor":"","utilization":"","balance":"","minPayment":""}],"estimates":[{"term":"","cost":"","savings":"","annualSavings":""}]} Return ONLY the JSON object, nothing else.'});
+    content.push({type:'text',text:'Extract financial data from these ClearOne Advantage screenshots for client: '+cname+'. Return ONLY valid JSON with these fields: {"clientName":"","currentBalance":"","currentInterest":"","currentPayments":"","currentPathMonths":"","interestPaid":"","totalAmountPaid":"","eligibleDebt":"","totalPayoff":"","debtConsolidation":"","creditCounseling":"","minimumPayments":"","activeCredit":"","remainingCredit":"","accounts":[{"creditor":"","utilization":"","balance":"","minPayment":""}],"estimates":[{"term":"","cost":"","savings":"","annualSavings":""}]} IMPORTANT: totalAmountPaid = the "Total Amount Paid" number from the Current Financial Path section. minimumPayments = the MINIMUM PAYMENTS comparison value. debtConsolidation = DEBT CONSOLIDATION comparison value. creditCounseling = CREDIT COUNSELING comparison value. Return ONLY the JSON object, nothing else.'});
 
     var resp = await fetch('/api/chat', {
       method:'POST',
@@ -254,11 +253,17 @@ function buildEmail(d) {
   var apr  = parseFloat((d.currentInterest||'28').replace(/[^0-9.]/g,''))||28;
   var bal  = d.currentBalance||d.eligibleDebt||'';
   var int  = calcInterest(bal, apr.toString());
-  var activeNum = parseFloat((d.activeCredit||'88').replace(/[^0-9.]/g,''))||88;
+  var activeNum = parseFloat((d.activeCredit||'0').replace(/[^0-9.]/g,''))||0;
   var pct  = Math.min(activeNum,100);
   var gcolor = pct>90?'#c0392b':pct>70?'#e67e22':'#2e7d32';
 
-  var maxVal = parseFloat((d.minimumPayments||d.totalPayoff||'150000').replace(/[^0-9,]/g,''))||150000;
+  var maxVal = Math.max(
+    parseFloat((d.minimumPayments||d.totalAmountPaid||'0').replace(/[^0-9,]/g,'')),
+    parseFloat((d.debtConsolidation||'0').replace(/[^0-9,]/g,'')),
+    parseFloat((d.creditCounseling||'0').replace(/[^0-9,]/g,'')),
+    parseFloat((d.estCost||d.totalPayoff||'0').replace(/[^0-9,]/g,'')),
+    1
+  ) || 150000;
   function bpct(v){ var n=parseFloat((v||'0').replace(/[^0-9,]/g,'')); return Math.max(10,Math.round((n/maxVal)*82)); }
 
   var acctRows = (d.accounts||[]).map(function(a,i){
@@ -275,7 +280,7 @@ function buildEmail(d) {
     {l:'ClearOne', v:fmtMoney(d.estCost||d.totalPayoff), c:'#2196f3'},
     {l:'DEBT CONSOLIDATION', v:fmtMoney(d.debtConsolidation), c:'#ffc107'},
     {l:'CREDIT COUNSELING', v:fmtMoney(d.creditCounseling), c:'#ff7043'},
-    {l:'MINIMUM PAYMENTS', v:fmtMoney(d.minimumPayments), c:'#e53935'},
+    {l:'MINIMUM PAYMENTS', v:fmtMoney(d.minimumPayments||d.totalAmountPaid), c:'#e53935'},
   ].filter(function(r){return r.v;}).map(function(r){
     return '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:11px;"><tr><td style="width:140px;text-align:right;padding-right:12px;vertical-align:middle;"><span style="font-size:10px;color:#aaa;text-transform:uppercase;">'+r.l+'</span></td><td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="background:'+r.c+';border-radius:3px;height:26px;width:'+(bpct(r.v)*5)+'px;padding:0 10px;vertical-align:middle;"><span style="font-size:11px;font-weight:bold;color:#fff;white-space:nowrap;">'+r.v+'</span></td></tr></table></td></tr></table>';
   }).join('');
@@ -284,7 +289,7 @@ function buildEmail(d) {
     {l:'plan eligible debt', v:fmtMoney(d.eligibleDebt)},
     {l:'new plan payment', v:fmtMoney(d.pay1)},
     {l:'estimated program length', v: d.term1?d.term1+' months':''},
-    {l:'estimated total payoff', v:fmtMoney(d.estCost||d.totalPayoff)}
+    {l:'estimated total cost', v:fmtMoney(d.estCost||d.totalPayoff)}
   ].filter(function(x){return x.v;}).map(function(x){
     return '<td style="background:#fff;border:1px solid #dde3ea;border-radius:6px;padding:12px 6px;text-align:center;vertical-align:top;"><p style="font-size:17px;font-weight:bold;color:#1a3a5c;margin:0;">'+x.v+'</p><p style="font-size:10px;color:#777;margin:4px 0 0 0;">'+x.l+'</p></td>';
   }).join('');
@@ -338,11 +343,7 @@ function buildEmail(d) {
   +'<td style="width:48%;background:#4cae4c;border-radius:6px;padding:16px;text-align:center;"><p style="font-size:13px;font-weight:bold;color:#fff;margin:0;">One single monthly payment.</p></td>'
   +'<td style="width:4%;"></td>'
   +'<td style="width:48%;background:#4cae4c;border-radius:6px;padding:16px;text-align:center;"><p style="font-size:13px;font-weight:bold;color:#fff;margin:0;">A reduced principal unsecured debt balance.</p></td>'
-  +'</tr><tr><td colspan="3" style="padding-top:6px;"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
-  +'<td style="width:20%;"></td>'
-  +'<td style="width:60%;background:#4cae4c;border-radius:6px;padding:16px;text-align:center;"><p style="font-size:13px;font-weight:bold;color:#fff;margin:0;">Your enrolled debts should be resolved within an average of 48-60 months.*</p></td>'
-  +'<td style="width:20%;"></td>'
-  +'</tr></table></td></tr></table></td></tr>'
+  +'</tr></table></td></tr>'
 
   // Trust
   +'<tr><td style="padding:0 30px 14px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f8fa;border-radius:6px;border:1px solid #eee;"><tr><td style="padding:18px;text-align:center;"><p style="font-size:18px;font-weight:bold;color:#1a3a5c;margin:0 0 14px;">The Trust We\'ve Earned</p><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
