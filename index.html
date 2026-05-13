@@ -208,9 +208,9 @@ Extract every account row. If a field is not visible use empty string. Return ON
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+              body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
+        max_tokens: 2000,
         messages: [{ role: 'user', content }]
       })
     });
