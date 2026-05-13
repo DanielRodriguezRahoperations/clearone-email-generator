@@ -252,7 +252,7 @@ Extract every account row. If a field is not visible use empty string. Return ON
 
 function downloadEml() {
   if (!window._generatedHTML) return;
-  const eml = `MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nSubject: Your ClearOne Advantage Debt Relief Plan\r\nFrom: \r\nTo: \r\n\r\n${window._generatedHTML}`;
+  const eml = `MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nX-Unsent: 1\r\nSubject: Your ClearOne Advantage Debt Relief Plan\r\nTo: \r\n\r\n${window._generatedHTML}`;
   const blob = new Blob([eml], { type: 'message/rfc822' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
