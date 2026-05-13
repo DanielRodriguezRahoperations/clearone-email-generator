@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -217,6 +216,7 @@ Extract every account row. If a field is not visible use empty string. Return ON
     });
 
     const data = await resp.json();
+    if (!data.content) throw new Error('API Error: ' + JSON.stringify(data));
     const raw = data.content.map(c => c.text || '').join('');
     const clean = raw.replace(/```json|```/g, '').trim();
     const d = JSON.parse(clean);
