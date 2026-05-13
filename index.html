@@ -1,883 +1,363 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ClearOne Email Generator</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, sans-serif; background: #f0f4f8; color: #333; }
-  header { background: #1a3a5c; color: white; padding: 18px 30px; }
-  header h1 { font-size: 20px; }
-  header span { font-size: 13px; opacity: 0.7; }
-  .container { max-width: 960px; margin: 30px auto; padding: 0 20px; }
-  .card { background: white; border-radius: 10px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-  h2 { font-size: 16px; color: #1a3a5c; margin-bottom: 14px; border-bottom: 2px solid #e8f0fe; padding-bottom: 8px; }
-  .drop-zone { border: 2px dashed #7db8e8; border-radius: 10px; padding: 28px; text-align: center; cursor: pointer; background: #f9fbff; position: relative; }
-  .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .previews { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-  .preview-img { position: relative; }
-  .preview-img img { width: 130px; height: 90px; object-fit: cover; border-radius: 6px; border: 2px solid #ddd; }
-  .preview-img button { position: absolute; top: -6px; right: -6px; background: #c0392b; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; line-height: 20px; }
-  .field-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; }
-  .field-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-  label { font-size: 13px; font-weight: bold; color: #444; display: block; margin-bottom: 4px; }
-  input, select { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-  .section-label { font-size: 13px; font-weight: bold; color: #1a3a5c; margin: 16px 0 8px; border-left: 3px solid #1a3a5c; padding-left: 8px; }
-  .btn { background: #1a7a4a; color: white; border: none; padding: 12px 28px; border-radius: 6px; font-size: 15px; cursor: pointer; font-weight: bold; margin-top: 16px; width: 100%; }
-  .btn:disabled { background: #999; cursor: not-allowed; }
-  .btn-action { color: white; border: none; padding: 11px 22px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: bold; }
-  #output-section { display: none; }
-  #preview-frame { width: 100%; height: 900px; border: 1px solid #ddd; border-radius: 6px; background: white; margin-top: 14px; }
-  .status { font-size: 13px; color: #1a7a4a; margin-top: 10px; font-weight: bold; min-height: 20px; }
-  .error { color: #c0392b; font-size: 13px; margin-top: 8px; }
-  .note { font-size: 12px; color: #888; margin-top: 8px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #f0f4f8; color: #333; }
+header { background: #1a3a5c; color: white; padding: 18px 30px; }
+header h1 { font-size: 20px; }
+header p { font-size: 13px; opacity: 0.7; margin-top: 3px; }
+.wrap { max-width: 960px; margin: 30px auto; padding: 0 20px; }
+.card { background: white; border-radius: 10px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.card h2 { font-size: 15px; color: #1a3a5c; margin-bottom: 14px; border-bottom: 2px solid #e8f0fe; padding-bottom: 8px; }
+.drop-zone { border: 2px dashed #7db8e8; border-radius: 8px; padding: 28px; text-align: center; background: #f9fbff; position: relative; cursor: pointer; }
+.drop-zone input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.previews { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.thumb { position: relative; }
+.thumb img { width: 120px; height: 80px; object-fit: cover; border-radius: 5px; border: 2px solid #ddd; }
+.thumb button { position: absolute; top: -6px; right: -6px; background: #c0392b; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; }
+.sec-label { font-size: 13px; font-weight: bold; color: #1a3a5c; margin: 16px 0 8px; padding-left: 8px; border-left: 3px solid #1a3a5c; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+label { font-size: 12px; font-weight: bold; color: #555; display: block; margin-bottom: 4px; }
+input, select { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+.ro { background: #f5f5f5; color: #2e7d32; font-weight: bold; }
+.btn-gen { background: #1a7a4a; color: white; border: none; padding: 13px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 16px; }
+.btn-gen:disabled { background: #999; cursor: not-allowed; }
+.btn-dl { background: #1a7a4a; color: white; border: none; padding: 11px 22px; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; margin-right: 10px; }
+.btn-prev { background: #1a3a5c; color: white; border: none; padding: 11px 22px; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
+#status { font-size: 13px; color: #1a7a4a; font-weight: bold; margin-top: 10px; min-height: 18px; }
+#errmsg { font-size: 13px; color: #c0392b; margin-top: 6px; }
+#output { display: none; }
+#frame { width: 100%; height: 900px; border: 1px solid #ddd; border-radius: 6px; margin-top: 14px; }
+.howto { background: #e8f5ee; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; }
+.howto ol { font-size: 13px; color: #444; padding-left: 18px; line-height: 2.2; }
 </style>
 </head>
 <body>
+
 <header>
-  <h1>ClearOne Advantage — AI Email Generator</h1>
-  <span>Upload client screenshots → Fill in details → Generate email</span>
+  <h1>ClearOne Advantage — Email Generator</h1>
+  <p>Upload screenshots + fill in details → Generate client email</p>
 </header>
-<div class="container">
+
+<div class="wrap">
   <div class="card">
-    <h2>Step 1 — Upload Screenshots & Fill In Client Details</h2>
-    <div class="drop-zone" id="drop-zone">
-      <div style="font-size:32px;">📸</div>
-      <strong>Click to upload or drag & drop screenshots here</strong>
-      <p style="font-size:13px;color:#666;margin-top:6px;">Upload Current Financial Path, Account Details slides, etc.</p>
-      <input type="file" id="file-input" accept="image/*" multiple>
+    <h2>Step 1 — Upload Screenshots &amp; Fill In Details</h2>
+
+    <div class="drop-zone" id="dz">
+      <div style="font-size:30px">📸</div>
+      <strong>Click to upload or drag &amp; drop screenshots</strong>
+      <p style="font-size:13px;color:#666;margin-top:5px">Current Financial Path, Account Details, etc.</p>
+      <input type="file" id="fi" accept="image/*" multiple>
     </div>
     <div class="previews" id="previews"></div>
 
-    <div class="section-label">Client Info</div>
-    <div class="field-grid">
-      <div><label>Client Name</label><input type="text" id="client-name" placeholder="e.g. CaTronna Verrett"></div>
-      <div><label>Current Monthly Payment</label><input type="text" id="current-payment" placeholder="e.g. $662.00" oninput="calcSavings()"></div>
-      <div><label>Estimated Cost to Client</label><input type="text" id="est-cost" placeholder="e.g. $38,534.26"></div>
+    <div class="sec-label">Client Info</div>
+    <div class="grid3">
+      <div><label>Client Name</label><input id="cname" placeholder="e.g. CaTronna Verrett"></div>
+      <div><label>Current Monthly Payment</label><input id="currpay" placeholder="e.g. 662.00" oninput="autoSavings()"></div>
+      <div><label>Estimated Cost to Client</label><input id="estcost" placeholder="e.g. $38,534.26"></div>
     </div>
 
-    <div class="section-label">Program Option 1</div>
-    <div class="field-grid">
-      <div><label>Term (months)</label><input type="text" id="term1" placeholder="e.g. 48"></div>
-      <div><label>Monthly Payment</label><input type="text" id="payment1" placeholder="e.g. $693.18" oninput="calcSavings()"></div>
-      <div><label>Monthly Savings <span style="font-weight:normal;color:#888;">(auto-calculated)</span></label><input type="text" id="savings1" placeholder="Auto-calculated" readonly style="background:#f5f5f5;color:#2e7d32;font-weight:bold;"></div>
+    <div class="sec-label">Program Option 1</div>
+    <div class="grid3">
+      <div><label>Term (months)</label><input id="term1" placeholder="e.g. 48"></div>
+      <div><label>Monthly Payment</label><input id="pay1" placeholder="e.g. 693.18" oninput="autoSavings()"></div>
+      <div><label>Monthly Savings (auto)</label><input id="sav1" class="ro" readonly placeholder="Auto-calculated"></div>
     </div>
 
-    <div class="section-label">Program Option 2</div>
-    <div class="field-grid">
-      <div><label>Term (months)</label><input type="text" id="term2" placeholder="e.g. 60"></div>
-      <div><label>Monthly Payment</label><input type="text" id="payment2" placeholder="e.g. $559.00" oninput="calcSavings()"></div>
-      <div><label>Monthly Savings <span style="font-weight:normal;color:#888;">(auto-calculated)</span></label><input type="text" id="savings2" placeholder="Auto-calculated" readonly style="background:#f5f5f5;color:#2e7d32;font-weight:bold;"></div>
+    <div class="sec-label">Program Option 2</div>
+    <div class="grid3">
+      <div><label>Term (months)</label><input id="term2" placeholder="e.g. 60"></div>
+      <div><label>Monthly Payment</label><input id="pay2" placeholder="e.g. 559.00" oninput="autoSavings()"></div>
+      <div><label>Monthly Savings (auto)</label><input id="sav2" class="ro" readonly placeholder="Auto-calculated"></div>
     </div>
 
-    <div id="status" class="status"></div>
-    <div id="error" class="error"></div>
-    <button class="btn" id="gen-btn" onclick="generateEmail()">Generate Email →</button>
-    <p class="note">Images processed by AI — nothing stored.</p>
+    <div id="status"></div>
+    <div id="errmsg"></div>
+    <button class="btn-gen" id="genbtn" onclick="go()">Generate Email →</button>
+    <p style="font-size:12px;color:#888;margin-top:8px">Images processed by AI — nothing stored.</p>
   </div>
 
-  <div class="card" id="output-section">
+  <div class="card" id="output">
     <h2>Step 2 — Send to Client</h2>
-    <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
-      <button class="btn-action" style="background:#1a7a4a;" onclick="downloadEml()">Download & Open in Outlook</button>
-      <button class="btn-action" style="background:#1a3a5c;" onclick="openPreview()">Preview in New Tab</button>
-    </div>
-    <div style="background:#e8f5ee;border-radius:8px;padding:12px;margin-bottom:12px;">
-      <ol style="font-size:13px;color:#444;padding-left:18px;line-height:2;">
-        <li>Click <strong>Download & Open in Outlook</strong></li>
+    <button class="btn-dl" onclick="dlEml()">Download &amp; Open in Outlook</button>
+    <button class="btn-prev" onclick="newTab()">Preview in New Tab</button>
+    <div class="howto" style="margin-top:14px">
+      <ol>
+        <li>Click <strong>Download &amp; Open in Outlook</strong></li>
         <li>Right-click the .eml file → <strong>Open with → Outlook Classic</strong></li>
         <li>Add client email and hit <strong>Send</strong></li>
       </ol>
     </div>
-    <iframe id="preview-frame"></iframe>
+    <iframe id="frame"></iframe>
   </div>
 </div>
 
 <script>
-let uploadedFiles = [];
-const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
-const previews  = document.getElementById('previews');
+var files = [];
 
-fileInput.addEventListener('change', e => handleFiles(e.target.files));
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+document.getElementById('dz').addEventListener('dragover', function(e){ e.preventDefault(); });
+document.getElementById('dz').addEventListener('drop', function(e){ e.preventDefault(); addFiles(e.dataTransfer.files); });
+document.getElementById('fi').addEventListener('change', function(e){ addFiles(e.target.files); });
 
-function handleFiles(files) {
-  for (const f of files) {
-    if (!f.type.startsWith('image/')) continue;
-    uploadedFiles.push(f);
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const wrap = document.createElement('div'); wrap.className = 'preview-img';
-      const idx = uploadedFiles.length - 1;
-      wrap.innerHTML = `<img src="${ev.target.result}"><button onclick="removeImg(${idx})">✕</button>`;
-      previews.appendChild(wrap);
-    };
-    reader.readAsDataURL(f);
+function addFiles(list) {
+  for (var i=0; i<list.length; i++) {
+    if (!list[i].type.startsWith('image/')) continue;
+    files.push(list[i]);
+    (function(f, idx){
+      var r = new FileReader();
+      r.onload = function(e){
+        var d = document.createElement('div');
+        d.className = 'thumb';
+        d.innerHTML = '<img src="'+e.target.result+'"><button onclick="removeFile('+idx+')">x</button>';
+        document.getElementById('previews').appendChild(d);
+      };
+      r.readAsDataURL(f);
+    })(list[i], files.length-1);
   }
 }
 
-function removeImg(idx) {
-  uploadedFiles.splice(idx, 1);
-  previews.innerHTML = '';
-  uploadedFiles.forEach((f, i) => {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const wrap = document.createElement('div'); wrap.className = 'preview-img';
-      wrap.innerHTML = `<img src="${ev.target.result}"><button onclick="removeImg(${i})">✕</button>`;
-      previews.appendChild(wrap);
+function removeFile(idx) {
+  files.splice(idx, 1);
+  var p = document.getElementById('previews');
+  p.innerHTML = '';
+  files.forEach(function(f, i){
+    var r = new FileReader();
+    r.onload = function(e){
+      var d = document.createElement('div');
+      d.className = 'thumb';
+      d.innerHTML = '<img src="'+e.target.result+'"><button onclick="removeFile('+i+')">x</button>';
+      p.appendChild(d);
     };
-    reader.readAsDataURL(f);
+    r.readAsDataURL(f);
   });
 }
 
-function calcSavings() {
-  const curr = parseFloat(document.getElementById('current-payment').value.replace(/[^0-9.]/g,''));
-  const p1   = parseFloat(document.getElementById('payment1').value.replace(/[^0-9.]/g,''));
-  const p2   = parseFloat(document.getElementById('payment2').value.replace(/[^0-9.]/g,''));
-  const fmt2 = n => ' document.getElementById('status').textContent = msg; }
-function setError(msg)  { document.getElementById('error').textContent = msg; }
-
-function fmt(val) {
-  if (!val) return '';
-  const s = val.toString().trim();
-  if (!s) return '';
-  // Already has cents
-  if (/\.\d{2}$/.test(s)) return s.startsWith('$') ? s : '$' + s;
-  // Has decimal but not 2 places
-  if (s.includes('.')) return (s.startsWith('$') ? s : '$' + s) + '0';
-  // No decimal — add .00
-  const num = s.replace(/[^0-9,]/g,'');
-  return '$' + num + '.00';
+function autoSavings() {
+  var curr = parseFloat(document.getElementById('currpay').value.replace(/[^0-9.]/g,''));
+  var p1   = parseFloat(document.getElementById('pay1').value.replace(/[^0-9.]/g,''));
+  var p2   = parseFloat(document.getElementById('pay2').value.replace(/[^0-9.]/g,''));
+  function f(n){ return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  if (curr && p1 && curr > p1) document.getElementById('sav1').value = f(curr-p1);
+  if (curr && p2 && curr > p2) document.getElementById('sav2').value = f(curr-p2);
 }
 
-function calcInterest(balance, apr) {
-  const b = parseFloat((balance||'0').replace(/[^0-9.]/g,''));
-  const r = parseFloat((apr||'28').replace(/[^0-9.]/g,'')) / 100;
-  if (!b || !r) return {monthly: '—', yearly: '—'};
-  // Compound daily
-  const daily = r / 365;
-  const monthlyInterest = b * (Math.pow(1 + daily, 30) - 1);
-  const yearlyInterest  = b * (Math.pow(1 + daily, 365) - 1);
-  return {
-    monthly: '$' + monthlyInterest.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}),
-    yearly:  '$' + yearlyInterest.toLocaleString('en-US',  {minimumFractionDigits:2, maximumFractionDigits:2})
-  };
-}
-
-async function fileToBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(',')[1]);
+function toB64(file) {
+  return new Promise(function(res,rej){
+    var r = new FileReader();
+    r.onload = function(){ res(r.result.split(',')[1]); };
     r.onerror = rej;
     r.readAsDataURL(file);
   });
 }
 
-async function generateEmail() {
-  setError('');
-  if (uploadedFiles.length === 0) { setError('⚠️ Please upload at least one screenshot first.'); return; }
-  const btn = document.getElementById('gen-btn');
-  btn.disabled = true; btn.textContent = '⏳ AI reading screenshots...';
-  setStatus('Sending to AI...');
-  try {
-    const content = [];
-    for (const f of uploadedFiles) {
-      const b64 = await fileToBase64(f);
-      content.push({ type: 'image', source: { type: 'base64', media_type: f.type, data: b64 } });
-    }
-    const clientName = document.getElementById('client-name').value.trim() || 'Valued Client';
-    content.push({ type: 'text', text: `Extract financial data from these ClearOne Advantage screenshots for: ${clientName}. Return ONLY valid JSON: {"clientName":"","currentBalance":"","currentInterest":"","currentPayments":"","currentPathMonths":"","interestPaid":"","eligibleDebt":"","totalPayoff":"","debtConsolidation":"","creditCounseling":"","minimumPayments":"","activeCredit":"","remainingCredit":"","accounts":[{"creditor":"","utilization":"","balance":"","minPayment":""}],"estimates":[{"term":"","cost":"","savings":"","annualSavings":""}]} Extract all account rows. Return ONLY JSON.` });
-
-    const resp = await fetch('/api/chat', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 2000, messages: [{ role: 'user', content }] })
-    });
-    const data = await resp.json();
-    if (!data.content) throw new Error('API Error: ' + JSON.stringify(data));
-    const raw = data.content.map(c => c.text || '').join('');
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const d = JSON.parse(clean);
-
-    // Manual overrides
-    d.clientName     = clientName;
-    d.estCost        = document.getElementById('est-cost').value.trim();
-    d.currentPayments= document.getElementById('current-payment').value.trim() || d.currentPayments;
-    d.term1          = document.getElementById('term1').value.trim();
-    d.payment1       = document.getElementById('payment1').value.trim();
-    d.savings1       = document.getElementById('savings1').value.trim();
-    d.term2          = document.getElementById('term2').value.trim();
-    d.payment2       = document.getElementById('payment2').value.trim();
-    d.savings2       = document.getElementById('savings2').value.trim();
-
-    const html = buildEmail(d);
-    window._generatedHTML = html;
-    const frame = document.getElementById('preview-frame');
-    const doc = frame.contentDocument || frame.contentWindow.document;
-    doc.open();
-    doc.write('<!DOCTYPE html><html><body style="margin:0;padding:0;background:#fff;">' + html + '</body></html>');
-    doc.close();
-    document.getElementById('output-section').style.display = 'block';
-    document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
-    setStatus('✅ Email generated!');
-  } catch(err) {
-    setError('❌ Error: ' + err.message); setStatus('');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Generate Email →';
-  }
-}
-
-function downloadEml() {
-  if (!window._generatedHTML) return;
-  const eml = `MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nX-Unsent: 1\r\nSubject: Your ClearOne Advantage Debt Relief Plan\r\nTo: \r\n\r\n${window._generatedHTML}`;
-  const blob = new Blob([eml], { type: 'message/rfc822' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'client-plan.eml'; a.click();
-  URL.revokeObjectURL(url);
-}
-
-function openPreview() {
-  if (!window._generatedHTML) return;
-  const win = window.open('', '_blank');
-  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;">' + window._generatedHTML + '</body></html>');
-  win.document.close();
-}
-
-function buildEmail(d) {
-  const name = d.clientName || 'Valued Client';
-  const apr = parseFloat((d.currentInterest||'28').replace(/[^0-9.]/g,'')) || 28;
-  const balance = d.currentBalance || d.eligibleDebt || '';
-  const interest = calcInterest(balance, apr.toString());
-  const activeNum = parseFloat((d.activeCredit||'88').replace(/[^0-9.]/g,'')) || 88;
-
-  // Bar chart
-  const maxVal = parseFloat((d.minimumPayments||d.totalPayoff||'150000').replace(/[^0-9,]/g,'')) || 150000;
-  function barPct(val) {
-    const n = parseFloat((val||'0').replace(/[^0-9,]/g,''));
-    return Math.max(10, Math.round((n / maxVal) * 85));
-  }
-
-  const acctRows = (d.accounts||[]).map((a,i) => {
-    const util = a.utilization ? parseInt(a.utilization) : 0;
-    const utilColor = util > 100 ? '#c0392b' : util > 75 ? '#e67e22' : '#2e7d32';
-    return `<tr style="background:${i%2===0?'#ffffff':'#f5f8fa'};">
-      <td style="padding:7px 10px;font-size:11px;color:#1a3a5c;border-bottom:1px solid #eee;">${a.creditor||''}</td>
-      <td style="padding:7px 10px;font-size:11px;font-weight:bold;color:${utilColor};border-bottom:1px solid #eee;text-align:center;">${a.utilization||'—'}</td>
-      <td style="padding:7px 10px;font-size:11px;font-weight:bold;color:#1a3a5c;border-bottom:1px solid #eee;text-align:center;">${fmt(a.balance)}</td>
-      <td style="padding:7px 10px;font-size:11px;color:#555;border-bottom:1px solid #eee;text-align:center;">${fmt(a.minPayment)}</td>
-    </tr>`;
-  }).join('');
-
-  // CSS circle gauge using conic-gradient (works in modern Outlook/browsers)
-  const pct = Math.min(activeNum, 100);
-  const gaugeColor = pct > 90 ? '#c0392b' : pct > 70 ? '#e67e22' : '#2e7d32';
-
-  return `
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">
-
-  <!-- Logo -->
-  <tr><td style="padding:20px 30px 14px;text-align:center;border-bottom:1px solid #eeeeee;">
-    <span style="font-size:24px;font-weight:bold;color:#9aa0a6;">Clear</span><span style="font-size:24px;font-weight:bold;color:#c0392b;">One</span><br>
-    <span style="font-size:11px;color:#9aa0a6;letter-spacing:1px;">Advantage&reg;</span>
-  </td></tr>
-
-  <!-- Intro -->
-  <tr><td style="padding:18px 30px 10px;">
-    <p style="font-size:13px;color:#333;margin:0 0 6px 0;">${name},</p>
-    <p style="font-size:13px;color:#555;line-height:1.6;margin:0;">Below is a snapshot of your ClearOne Advantage Plan. Your summary includes eligible debts from your credit file and provides a good faith estimate based on your creditors and our actual historical results.</p>
-  </td></tr>
-
-  <!-- Plan Highlights -->
-  <tr><td style="padding:14px 30px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#eef3f8;border-radius:6px;">
-      <tr><td style="padding:18px 20px;text-align:center;">
-        <p style="font-size:20px;font-weight:bold;color:#1a3a5c;margin:0 0 6px 0;">Plan Highlights for ${name}</p>
-        ${d.payment1 ? `<p style="font-size:13px;color:#555;margin:0 0 16px 0;">Your new plan payment is <strong style="color:#1a3a5c;">${fmt(d.payment1)}</strong>${d.savings1 ? ` — that's <strong>${fmt(d.savings1)}</strong> less than what your creditors expect today` : ''}</p>` : ''}
-        <table width="100%" cellpadding="4" cellspacing="4" border="0">
-          <tr>
-            ${[
-              {l:'Plan Eligible Debt', v:fmt(d.eligibleDebt)},
-              {l:'New Plan Payment', v:fmt(d.payment1)},
-              {l:'Program Length', v: d.term1 ? d.term1+' months' : ''},
-              {l:'Est. Total Payoff', v:fmt(d.estCost||d.totalPayoff)}
-            ].filter(x=>x.v).map(x=>`
-            <td style="background:#ffffff;border:1px solid #dde3ea;border-radius:6px;padding:12px 6px;text-align:center;vertical-align:top;">
-              <p style="font-size:17px;font-weight:bold;color:#1a3a5c;margin:0;">${x.v}</p>
-              <p style="font-size:10px;color:#777;margin:4px 0 0 0;">${x.l}</p>
-            </td>`).join('')}
-          </tr>
-        </table>
-      </td></tr>
-    </table>
-  </td></tr>
-
-  <!-- Two Payment Options -->
-  ${d.term1 || d.term2 ? `
-  <tr><td style="padding:0 30px 14px;">
-    <p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px 0;">Your Program Options</p>
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;">
-      <tr style="background:#1a3a5c;">
-        <td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Term</td>
-        <td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Monthly Payment</td>
-        <td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Monthly Savings</td>
-      </tr>
-      ${d.term1 ? `<tr style="background:#f0faf4;"><td style="padding:10px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;border-bottom:1px solid #eee;">${d.term1} months</td><td style="padding:10px 12px;font-size:14px;font-weight:bold;color:#2e7d32;border-bottom:1px solid #eee;">${fmt(d.payment1)}</td><td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;border-bottom:1px solid #eee;">${fmt(d.savings1)}</td></tr>` : ''}
-      ${d.term2 ? `<tr><td style="padding:10px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;">${d.term2} months</td><td style="padding:10px 12px;font-size:14px;font-weight:bold;color:#2e7d32;">${fmt(d.payment2)}</td><td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;">${fmt(d.savings2)}</td></tr>` : ''}
-    </table>
-  </td></tr>` : ''}
-
-  <!-- Current Payment vs New Payment -->
-  ${d.currentPayments ? `
-  <tr><td style="padding:0 30px 14px;">
-    <p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px 0;">How Your Payment Compares</p>
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;">
-      <tr style="background:#1a3a5c;"><td style="padding:8px 12px;font-size:11px;color:white;font-weight:bold;">Payment</td><td style="padding:8px 12px;font-size:11px;color:white;font-weight:bold;">Amount</td></tr>
-      <tr><td style="padding:9px 12px;font-size:13px;border-bottom:1px solid #eee;">Current Monthly Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#c0392b;border-bottom:1px solid #eee;">${fmt(d.currentPayments)}</td></tr>
-      ${d.payment1 ? `<tr style="background:#f0faf4;"><td style="padding:9px 12px;font-size:13px;font-weight:bold;border-bottom:1px solid #eee;">New ClearOne Program Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#2e7d32;border-bottom:1px solid #eee;">${fmt(d.payment1)}</td></tr>` : ''}
-      ${d.savings1 ? `<tr><td style="padding:9px 12px;font-size:13px;">Monthly Savings</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#2e7d32;">${fmt(d.savings1)}</td></tr>` : ''}
-    </table>
-  </td></tr>` : ''}
-
-  <!-- Bar Chart Comparison -->
-  ${d.totalPayoff || d.minimumPayments ? `
-  <tr><td style="padding:0 30px 14px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d2340;border-radius:6px;">
-      <tr><td style="padding:22px 24px;">
-        <p style="color:#ffffff;font-size:13px;text-align:center;margin:0 0 20px 0;">Below shows you how your ClearOne plan compares<br>to other common debt repayment options.</p>
-        ${[
-          {l:'ClearOne', v:fmt(d.estCost||d.totalPayoff), color:'#2196f3'},
-          {l:'DEBT CONSOLIDATION', v:fmt(d.debtConsolidation), color:'#ffc107'},
-          {l:'CREDIT COUNSELING', v:fmt(d.creditCounseling), color:'#ff7043'},
-          {l:'MINIMUM PAYMENTS', v:fmt(d.minimumPayments), color:'#e53935'},
-        ].filter(r=>r.v).map(r=>`
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;">
-          <tr>
-            <td style="width:140px;text-align:right;padding-right:12px;vertical-align:middle;">
-              <span style="font-size:10px;color:#aaaaaa;text-transform:uppercase;">${r.l}</span>
-            </td>
-            <td style="vertical-align:middle;">
-              <div style="background:${r.color};border-radius:3px;height:26px;width:${barPct(r.v)}%;min-width:60px;display:flex;align-items:center;padding:0 10px;">
-                <span style="font-size:11px;font-weight:bold;color:#ffffff;white-space:nowrap;">${r.v}</span>
-              </div>
-            </td>
-          </tr>
-        </table>`).join('')}
-      </td></tr>
-    </table>
-  </td></tr>` : ''}
-
-  <!-- Credit Analysis Header -->
-  <tr><td style="padding:0 30px 14px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1e88e5;border-radius:6px;">
-      <tr><td style="padding:20px;text-align:center;">
-        <p style="font-size:22px;font-weight:bold;color:#ffffff;margin:0 0 4px 0;">Here's your credit analysis!</p>
-        <p style="font-size:13px;font-weight:bold;color:#ffffff;margin:0;">Understanding is the first step in our journey.</p>
-      </td></tr>
-    </table>
-  </td></tr>
-
-  <!-- Account Details -->
-  ${acctRows ? `
-  <tr><td style="padding:0 30px 14px;">
-    <p style="font-size:13px;font-weight:bold;color:#1a3a5c;text-align:center;margin:0 0 8px 0;">Account Details for ${name}</p>
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;">
-      <tr style="background:#1a3a5c;">
-        <td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;">Creditor</td>
-        <td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;text-align:center;">Utilization</td>
-        <td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;text-align:center;">Balance</td>
-        <td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;text-align:center;">Min. Payment</td>
-      </tr>
-      ${acctRows}
-    </table>
-  </td></tr>` : ''}
-
-  <!-- Credit Utilization + Interest Calculator -->
-  <tr><td style="padding:0 30px 14px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d2340;border-radius:6px;">
-      <tr>
-        <!-- Gauge left -->
-        <td style="padding:20px;vertical-align:top;width:40%;border-right:1px solid #1e3a5c;text-align:center;">
-          <p style="font-size:11px;color:#aaaaaa;text-transform:uppercase;margin:0 0 10px 0;">Credit Utilization</p>
-          <!-- CSS Circle Gauge -->
-          <div style="width:100px;height:100px;border-radius:50%;background:conic-gradient(${gaugeColor} ${pct}%, #2a4a6a ${pct}% 100%);margin:0 auto;display:flex;align-items:center;justify-content:center;">
-            <div style="width:72px;height:72px;background:#0d2340;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-              <span style="color:#ffffff;font-size:16px;font-weight:bold;">${d.activeCredit||activeNum+'%'}</span>
-            </div>
-          </div>
-          <p style="font-size:18px;font-weight:bold;color:#ffffff;margin:10px 0 4px 0;">POOR</p>
-          <p style="font-size:11px;color:#aaaaaa;margin:0;">Remaining: <strong style="color:#ffffff;">${d.remainingCredit||'—'}</strong></p>
-          <p style="font-size:11px;color:#aaaaaa;margin:3px 0 0 0;">Active: <strong style="color:#ffffff;">${d.activeCredit||'—'}</strong></p>
-        </td>
-        <!-- Interest Calculator right -->
-        <td style="padding:20px;vertical-align:top;">
-          <p style="font-size:12px;font-weight:bold;color:#ffffff;margin:0 0 12px 0;">Interest Calculator</p>
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-            ${[
-              {l:'Average Interest Rate', v: d.currentInterest || apr+'%'},
-              {l:"Current Month's Interest", v: interest.monthly},
-              {l:"Current Year's Interest", v: interest.yearly},
-            ].map((r,i)=>`
-            <tr style="background:${i%2===0?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.13)'};">
-              <td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#dce8f5;">${r.l}</td>
-              <td style="padding:9px 12px;font-size:12px;color:#ffffff;text-align:right;">${r.v}</td>
-            </tr>`).join('')}
-          </table>
-        </td>
-      </tr>
-    </table>
-  </td></tr>
-
-  <!-- Benefits -->
-  <tr><td style="padding:0 30px 14px;text-align:center;">
-    <p style="font-size:20px;font-weight:bold;color:#1a3a5c;margin:0 0 6px 0;">Benefits*</p>
-    <p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 14px 0;">Some of the Benefits of This Program Could Include:</p>
-    <table width="100%" cellpadding="0" cellspacing="6" border="0">
-      <tr>
-        <td style="width:48%;background:#4cae4c;border-radius:6px;padding:16px 12px;text-align:center;vertical-align:middle;">
-          <p style="font-size:13px;font-weight:bold;color:#ffffff;margin:0;">One single monthly payment.</p>
-        </td>
-        <td style="width:4%;"></td>
-        <td style="width:48%;background:#4cae4c;border-radius:6px;padding:16px 12px;text-align:center;vertical-align:middle;">
-          <p style="font-size:13px;font-weight:bold;color:#ffffff;margin:0;">A reduced principal unsecured debt balance.</p>
-        </td>
-      </tr>
-      <tr><td colspan="3" style="padding-top:6px;">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr><td style="width:25%;"></td>
-          <td style="width:50%;background:#4cae4c;border-radius:6px;padding:16px 12px;text-align:center;">
-            <p style="font-size:13px;font-weight:bold;color:#ffffff;margin:0;">Your enrolled debts should be resolved within an average of 48-60 months.*</p>
-          </td>
-          <td style="width:25%;"></td></tr>
-        </table>
-      </td></tr>
-    </table>
-  </td></tr>
-
-  <!-- Trust We've Earned -->
-  <tr><td style="padding:0 30px 14px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f8fa;border-radius:6px;border:1px solid #eee;">
-      <tr><td style="padding:18px;text-align:center;">
-        <p style="font-size:18px;font-weight:bold;color:#1a3a5c;margin:0 0 14px 0;">The Trust We've Earned</p>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td style="text-align:center;padding:0 10px;border-right:1px solid #ddd;">
-              <a href="https://www.trustpilot.com/review/clearoneadvantage.com" style="text-decoration:none;">
-                <p style="font-size:13px;font-weight:bold;color:#00b67a;margin:0;">&#9733; Trustpilot</p>
-                <p style="font-size:13px;color:#f4a71d;margin:3px 0;">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
-                <p style="font-size:10px;color:#555;margin:0;">4.8 &mdash; 8,700+ Reviews</p>
-              </a>
-            </td>
-            <td style="text-align:center;padding:0 10px;border-right:1px solid #ddd;">
-              <p style="font-size:13px;font-weight:bold;color:#4285f4;margin:0;">Google</p>
-              <p style="font-size:13px;color:#f4a71d;margin:3px 0;">&#9733;&#9733;&#9733;&#9733;</p>
-              <p style="font-size:10px;color:#555;margin:0;">4.4 &mdash; 2,800+ Reviews</p>
-            </td>
-            <td style="text-align:center;padding:0 10px;">
-              <a href="https://www.bbb.org/us/az/tempe/profile/debt-relief-services/clearone-advantage-1126-1000124228" style="text-decoration:none;">
-                <p style="font-size:16px;font-weight:bold;color:#003f87;margin:0;">BBB</p>
-                <p style="font-size:18px;font-weight:bold;color:#003f87;margin:2px 0;">A+</p>
-                <p style="font-size:10px;color:#555;margin:0;">Accredited Business</p>
-              </a>
-            </td>
-          </tr>
-        </table>
-      </td></tr>
-    </table>
-  </td></tr>
-
-  <!-- Signature -->
-  <tr><td style="padding:16px 30px;border-top:2px solid #1a3a5c;">
-    <p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0;">Daniel Rodriguez | Certified Debt Consultant</p>
-    <p style="font-size:12px;color:#333;margin:4px 0 0 0;">844-931-2650</p>
-    <p style="font-size:12px;margin:3px 0 0 0;"><a href="mailto:drodriguez@clearoneadvantage.com" style="color:#1a3a5c;text-decoration:none;">drodriguez@clearoneadvantage.com</a></p>
-    <p style="font-size:12px;margin:3px 0 0 0;"><a href="https://www.clearoneadvantage.com" style="color:#c0392b;text-decoration:none;font-weight:bold;">ClearOne Advantage</a></p>
-    <p style="font-size:11px;color:#888;margin:4px 0 0 0;font-style:italic;">We help people in debt find a clear path to financial stability.</p>
-  </td></tr>
-
-  <!-- Disclaimer -->
-  <tr><td style="padding:12px 30px;background:#f5f5f5;border-top:1px solid #ddd;">
-    <p style="font-size:9px;color:#999;line-height:1.6;text-align:center;">ClearOne Advantage, LLC is a debt settlement company, not a lender, loan broker, creditor, or debt collector. Entering into a debt settlement program could adversely affect your credit score. Not all clients complete their program. Individual results may vary. Not available in all states. 410 N Scottsdale Rd, Suite 1000, Tempe, AZ 85281 | C.P.D. Reg. No. T.S. 12-03822 | <a href="https://www.clearoneadvantage.com" style="color:#999;">www.clearoneadvantage.com</a></p>
-  </td></tr>
-
-</table>`;
-}
-</script>
-</body>
-</html>
- + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-  if (curr && p1) document.getElementById('savings1').value = fmt2(curr - p1);
-  if (curr && p2) document.getElementById('savings2').value = fmt2(curr - p2);
-}
-
-function setStatus(msg) { document.getElementById('status').textContent = msg; }
-function setError(msg)  { document.getElementById('error').textContent = msg; }
-
-function fmt(val) {
-  if (!val) return '';
-  const s = val.toString().trim();
+function fmtMoney(v) {
+  if (!v) return '';
+  var s = v.toString().replace(/[^0-9.]/g,'');
   if (!s) return '';
-  // Already has cents
-  if (/\.\d{2}$/.test(s)) return s.startsWith('$') ? s : '$' + s;
-  // Has decimal but not 2 places
-  if (s.includes('.')) return (s.startsWith('$') ? s : '$' + s) + '0';
-  // No decimal — add .00
-  const num = s.replace(/[^0-9,]/g,'');
-  return '$' + num + '.00';
+  var n = parseFloat(s);
+  if (isNaN(n)) return v;
+  return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
-function calcInterest(balance, apr) {
-  const b = parseFloat((balance||'0').replace(/[^0-9.]/g,''));
-  const r = parseFloat((apr||'28').replace(/[^0-9.]/g,'')) / 100;
-  if (!b || !r) return {monthly: '—', yearly: '—'};
-  // Compound daily
-  const daily = r / 365;
-  const monthlyInterest = b * (Math.pow(1 + daily, 30) - 1);
-  const yearlyInterest  = b * (Math.pow(1 + daily, 365) - 1);
-  return {
-    monthly: '$' + monthlyInterest.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}),
-    yearly:  '$' + yearlyInterest.toLocaleString('en-US',  {minimumFractionDigits:2, maximumFractionDigits:2})
-  };
+function calcInterest(bal, apr) {
+  var b = parseFloat((bal||'0').replace(/[^0-9.]/g,''));
+  var r = parseFloat((apr||'28').replace(/[^0-9.]/g,''))/100;
+  if (!b||!r) return {mo:'—',yr:'—'};
+  var daily = r/365;
+  var mo = b*(Math.pow(1+daily,30)-1);
+  var yr = b*(Math.pow(1+daily,365)-1);
+  function f(n){ return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  return {mo:f(mo), yr:f(yr)};
 }
 
-async function fileToBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(',')[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
+async function go() {
+  document.getElementById('errmsg').textContent = '';
+  if (files.length === 0) { document.getElementById('errmsg').textContent = 'Please upload at least one screenshot.'; return; }
+  var btn = document.getElementById('genbtn');
+  btn.disabled = true; btn.textContent = 'AI reading screenshots...';
+  document.getElementById('status').textContent = 'Sending to AI...';
 
-async function generateEmail() {
-  setError('');
-  if (uploadedFiles.length === 0) { setError('⚠️ Please upload at least one screenshot first.'); return; }
-  const btn = document.getElementById('gen-btn');
-  btn.disabled = true; btn.textContent = '⏳ AI reading screenshots...';
-  setStatus('Sending to AI...');
   try {
-    const content = [];
-    for (const f of uploadedFiles) {
-      const b64 = await fileToBase64(f);
-      content.push({ type: 'image', source: { type: 'base64', media_type: f.type, data: b64 } });
+    var content = [];
+    for (var i=0; i<files.length; i++) {
+      var b64 = await toB64(files[i]);
+      content.push({type:'image',source:{type:'base64',media_type:files[i].type,data:b64}});
     }
-    const clientName = document.getElementById('client-name').value.trim() || 'Valued Client';
-    content.push({ type: 'text', text: `Extract financial data from these ClearOne Advantage screenshots for: ${clientName}. Return ONLY valid JSON: {"clientName":"","currentBalance":"","currentInterest":"","currentPayments":"","currentPathMonths":"","interestPaid":"","eligibleDebt":"","totalPayoff":"","debtConsolidation":"","creditCounseling":"","minimumPayments":"","activeCredit":"","remainingCredit":"","accounts":[{"creditor":"","utilization":"","balance":"","minPayment":""}],"estimates":[{"term":"","cost":"","savings":"","annualSavings":""}]} Extract all account rows. Return ONLY JSON.` });
+    var cname = document.getElementById('cname').value.trim() || 'Valued Client';
+    content.push({type:'text',text:'Extract financial data from these ClearOne Advantage screenshots for client: '+cname+'. Return ONLY valid JSON with these fields: {"clientName":"","currentBalance":"","currentInterest":"","currentPayments":"","currentPathMonths":"","interestPaid":"","eligibleDebt":"","totalPayoff":"","debtConsolidation":"","creditCounseling":"","minimumPayments":"","activeCredit":"","remainingCredit":"","accounts":[{"creditor":"","utilization":"","balance":"","minPayment":""}],"estimates":[{"term":"","cost":"","savings":"","annualSavings":""}]} Return ONLY the JSON object, nothing else.'});
 
-    const resp = await fetch('/api/chat', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 2000, messages: [{ role: 'user', content }] })
+    var resp = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:2000,messages:[{role:'user',content:content}]})
     });
-    const data = await resp.json();
-    if (!data.content) throw new Error('API Error: ' + JSON.stringify(data));
-    const raw = data.content.map(c => c.text || '').join('');
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const d = JSON.parse(clean);
+    var data = await resp.json();
+    if (!data.content) throw new Error('API Error: '+JSON.stringify(data));
+    var raw = data.content.map(function(c){return c.text||'';}).join('');
+    var clean = raw.replace(/```json|```/g,'').trim();
+    var d = JSON.parse(clean);
 
-    // Manual overrides
-    d.clientName     = clientName;
-    d.estCost        = document.getElementById('est-cost').value.trim();
-    d.currentPayments= document.getElementById('current-payment').value.trim() || d.currentPayments;
-    d.term1          = document.getElementById('term1').value.trim();
-    d.payment1       = document.getElementById('payment1').value.trim();
-    d.savings1       = document.getElementById('savings1').value.trim();
-    d.term2          = document.getElementById('term2').value.trim();
-    d.payment2       = document.getElementById('payment2').value.trim();
-    d.savings2       = document.getElementById('savings2').value.trim();
+    d.clientName    = cname;
+    d.estCost       = document.getElementById('estcost').value.trim();
+    d.manualCurrPay = document.getElementById('currpay').value.trim();
+    d.term1         = document.getElementById('term1').value.trim();
+    d.pay1          = document.getElementById('pay1').value.trim();
+    d.sav1          = document.getElementById('sav1').value.trim();
+    d.term2         = document.getElementById('term2').value.trim();
+    d.pay2          = document.getElementById('pay2').value.trim();
+    d.sav2          = document.getElementById('sav2').value.trim();
+    if (d.manualCurrPay) d.currentPayments = d.manualCurrPay;
 
-    const html = buildEmail(d);
-    window._generatedHTML = html;
-    const frame = document.getElementById('preview-frame');
-    const doc = frame.contentDocument || frame.contentWindow.document;
-    doc.open();
-    doc.write('<!DOCTYPE html><html><body style="margin:0;padding:0;background:#fff;">' + html + '</body></html>');
-    doc.close();
-    document.getElementById('output-section').style.display = 'block';
-    document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
-    setStatus('✅ Email generated!');
-  } catch(err) {
-    setError('❌ Error: ' + err.message); setStatus('');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Generate Email →';
+    document.getElementById('status').textContent = 'Building email...';
+    var html = buildEmail(d);
+    window._html = html;
+
+    var fr = document.getElementById('frame');
+    var doc = fr.contentDocument || fr.contentWindow.document;
+    doc.open(); doc.write('<!DOCTYPE html><html><body style="margin:0;padding:0;">'+html+'</body></html>'); doc.close();
+    document.getElementById('output').style.display = 'block';
+    document.getElementById('output').scrollIntoView({behavior:'smooth'});
+    document.getElementById('status').textContent = 'Email generated!';
+  } catch(e) {
+    document.getElementById('errmsg').textContent = 'Error: '+e.message;
+    document.getElementById('status').textContent = '';
   }
+  btn.disabled = false; btn.textContent = 'Generate Email →';
 }
 
-function downloadEml() {
-  if (!window._generatedHTML) return;
-  const eml = `MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nX-Unsent: 1\r\nSubject: Your ClearOne Advantage Debt Relief Plan\r\nTo: \r\n\r\n${window._generatedHTML}`;
-  const blob = new Blob([eml], { type: 'message/rfc822' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'client-plan.eml'; a.click();
+function dlEml() {
+  if (!window._html) return;
+  var eml = 'MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nX-Unsent: 1\r\nSubject: Your ClearOne Advantage Debt Relief Plan\r\nTo: \r\n\r\n'+window._html;
+  var blob = new Blob([eml],{type:'message/rfc822'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href=url; a.download='client-plan.eml'; a.click();
   URL.revokeObjectURL(url);
 }
 
-function openPreview() {
-  if (!window._generatedHTML) return;
-  const win = window.open('', '_blank');
-  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;">' + window._generatedHTML + '</body></html>');
-  win.document.close();
+function newTab() {
+  if (!window._html) return;
+  var w = window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;">'+window._html+'</body></html>');
+  w.document.close();
 }
 
 function buildEmail(d) {
-  const name = d.clientName || 'Valued Client';
-  const apr = parseFloat((d.currentInterest||'28').replace(/[^0-9.]/g,'')) || 28;
-  const balance = d.currentBalance || d.eligibleDebt || '';
-  const interest = calcInterest(balance, apr.toString());
-  const activeNum = parseFloat((d.activeCredit||'88').replace(/[^0-9.]/g,'')) || 88;
+  var name = d.clientName || 'Valued Client';
+  var apr  = parseFloat((d.currentInterest||'28').replace(/[^0-9.]/g,''))||28;
+  var bal  = d.currentBalance||d.eligibleDebt||'';
+  var int  = calcInterest(bal, apr.toString());
+  var activeNum = parseFloat((d.activeCredit||'88').replace(/[^0-9.]/g,''))||88;
+  var pct  = Math.min(activeNum,100);
+  var gcolor = pct>90?'#c0392b':pct>70?'#e67e22':'#2e7d32';
 
-  // Bar chart
-  const maxVal = parseFloat((d.minimumPayments||d.totalPayoff||'150000').replace(/[^0-9,]/g,'')) || 150000;
-  function barPct(val) {
-    const n = parseFloat((val||'0').replace(/[^0-9,]/g,''));
-    return Math.max(10, Math.round((n / maxVal) * 85));
-  }
+  var maxVal = parseFloat((d.minimumPayments||d.totalPayoff||'150000').replace(/[^0-9,]/g,''))||150000;
+  function bpct(v){ var n=parseFloat((v||'0').replace(/[^0-9,]/g,'')); return Math.max(10,Math.round((n/maxVal)*82)); }
 
-  const acctRows = (d.accounts||[]).map((a,i) => {
-    const util = a.utilization ? parseInt(a.utilization) : 0;
-    const utilColor = util > 100 ? '#c0392b' : util > 75 ? '#e67e22' : '#2e7d32';
-    return `<tr style="background:${i%2===0?'#ffffff':'#f5f8fa'};">
-      <td style="padding:7px 10px;font-size:11px;color:#1a3a5c;border-bottom:1px solid #eee;">${a.creditor||''}</td>
-      <td style="padding:7px 10px;font-size:11px;font-weight:bold;color:${utilColor};border-bottom:1px solid #eee;text-align:center;">${a.utilization||'—'}</td>
-      <td style="padding:7px 10px;font-size:11px;font-weight:bold;color:#1a3a5c;border-bottom:1px solid #eee;text-align:center;">${fmt(a.balance)}</td>
-      <td style="padding:7px 10px;font-size:11px;color:#555;border-bottom:1px solid #eee;text-align:center;">${fmt(a.minPayment)}</td>
-    </tr>`;
+  var acctRows = (d.accounts||[]).map(function(a,i){
+    var u = a.utilization?parseInt(a.utilization):0;
+    var uc = u>100?'#c0392b':u>75?'#e67e22':'#2e7d32';
+    return '<tr style="background:'+(i%2===0?'#fff':'#f5f8fa')+';"><td style="padding:7px 10px;font-size:11px;color:#1a3a5c;border-bottom:1px solid #eee;">'+( a.creditor||'')+'</td><td style="padding:7px 10px;font-size:11px;font-weight:bold;color:'+uc+';border-bottom:1px solid #eee;text-align:center;">'+(a.utilization||'—')+'</td><td style="padding:7px 10px;font-size:11px;font-weight:bold;color:#1a3a5c;border-bottom:1px solid #eee;text-align:center;">'+fmtMoney(a.balance)+'</td><td style="padding:7px 10px;font-size:11px;color:#555;border-bottom:1px solid #eee;text-align:center;">'+fmtMoney(a.minPayment)+'</td></tr>';
   }).join('');
 
-  // CSS circle gauge using conic-gradient (works in modern Outlook/browsers)
-  const pct = Math.min(activeNum, 100);
-  const gaugeColor = pct > 90 ? '#c0392b' : pct > 70 ? '#e67e22' : '#2e7d32';
+  var estRows = (d.estimates||[]).map(function(e,i){
+    return '<tr style="background:'+(i%2===0?'rgba(255,255,255,0.06)':'rgba(255,255,255,0.12)')+'"><td style="padding:7px 8px;font-size:11px;color:#fff;text-align:center;">'+e.term+'</td><td style="padding:7px 8px;font-size:11px;color:#4cd4a0;font-weight:bold;text-align:center;">'+e.cost+'</td><td style="padding:7px 8px;font-size:11px;color:#fff;text-align:center;">'+e.savings+'</td><td style="padding:7px 8px;font-size:11px;color:#4cd4a0;font-weight:bold;text-align:center;">'+e.annualSavings+'</td></tr>';
+  }).join('');
 
-  return `
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">
+  var bars = [
+    {l:'ClearOne', v:fmtMoney(d.estCost||d.totalPayoff), c:'#2196f3'},
+    {l:'DEBT CONSOLIDATION', v:fmtMoney(d.debtConsolidation), c:'#ffc107'},
+    {l:'CREDIT COUNSELING', v:fmtMoney(d.creditCounseling), c:'#ff7043'},
+    {l:'MINIMUM PAYMENTS', v:fmtMoney(d.minimumPayments), c:'#e53935'},
+  ].filter(function(r){return r.v;}).map(function(r){
+    return '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:11px;"><tr><td style="width:140px;text-align:right;padding-right:12px;vertical-align:middle;"><span style="font-size:10px;color:#aaa;text-transform:uppercase;">'+r.l+'</span></td><td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="background:'+r.c+';border-radius:3px;height:26px;width:'+(bpct(r.v)*5)+'px;padding:0 10px;vertical-align:middle;"><span style="font-size:11px;font-weight:bold;color:#fff;white-space:nowrap;">'+r.v+'</span></td></tr></table></td></tr></table>';
+  }).join('');
 
-  <!-- Logo -->
-  <tr><td style="padding:20px 30px 14px;text-align:center;border-bottom:1px solid #eeeeee;">
-    <span style="font-size:24px;font-weight:bold;color:#9aa0a6;">Clear</span><span style="font-size:24px;font-weight:bold;color:#c0392b;">One</span><br>
-    <span style="font-size:11px;color:#9aa0a6;letter-spacing:1px;">Advantage&reg;</span>
-  </td></tr>
+  var statBoxes = [
+    {l:'plan eligible debt', v:fmtMoney(d.eligibleDebt)},
+    {l:'new plan payment', v:fmtMoney(d.pay1)},
+    {l:'estimated program length', v: d.term1?d.term1+' months':''},
+    {l:'estimated total payoff', v:fmtMoney(d.estCost||d.totalPayoff)}
+  ].filter(function(x){return x.v;}).map(function(x){
+    return '<td style="background:#fff;border:1px solid #dde3ea;border-radius:6px;padding:12px 6px;text-align:center;vertical-align:top;"><p style="font-size:17px;font-weight:bold;color:#1a3a5c;margin:0;">'+x.v+'</p><p style="font-size:10px;color:#777;margin:4px 0 0 0;">'+x.l+'</p></td>';
+  }).join('');
 
-  <!-- Intro -->
-  <tr><td style="padding:18px 30px 10px;">
-    <p style="font-size:13px;color:#333;margin:0 0 6px 0;">${name},</p>
-    <p style="font-size:13px;color:#555;line-height:1.6;margin:0;">Below is a snapshot of your ClearOne Advantage Plan. Your summary includes eligible debts from your credit file and provides a good faith estimate based on your creditors and our actual historical results.</p>
-  </td></tr>
+  return '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fff;font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">'
 
-  <!-- Plan Highlights -->
-  <tr><td style="padding:14px 30px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#eef3f8;border-radius:6px;">
-      <tr><td style="padding:18px 20px;text-align:center;">
-        <p style="font-size:20px;font-weight:bold;color:#1a3a5c;margin:0 0 6px 0;">Plan Highlights for ${name}</p>
-        ${d.payment1 ? `<p style="font-size:13px;color:#555;margin:0 0 16px 0;">Your new plan payment is <strong style="color:#1a3a5c;">${fmt(d.payment1)}</strong>${d.savings1 ? ` — that's <strong>${fmt(d.savings1)}</strong> less than what your creditors expect today` : ''}</p>` : ''}
-        <table width="100%" cellpadding="4" cellspacing="4" border="0">
-          <tr>
-            ${[
-              {l:'Plan Eligible Debt', v:fmt(d.eligibleDebt)},
-              {l:'New Plan Payment', v:fmt(d.payment1)},
-              {l:'Program Length', v: d.term1 ? d.term1+' months' : ''},
-              {l:'Est. Total Payoff', v:fmt(d.estCost||d.totalPayoff)}
-            ].filter(x=>x.v).map(x=>`
-            <td style="background:#ffffff;border:1px solid #dde3ea;border-radius:6px;padding:12px 6px;text-align:center;vertical-align:top;">
-              <p style="font-size:17px;font-weight:bold;color:#1a3a5c;margin:0;">${x.v}</p>
-              <p style="font-size:10px;color:#777;margin:4px 0 0 0;">${x.l}</p>
-            </td>`).join('')}
-          </tr>
-        </table>
-      </td></tr>
-    </table>
-  </td></tr>
+  // Logo
+  +'<tr><td style="padding:20px 30px 14px;text-align:center;border-bottom:1px solid #eee;"><span style="font-size:24px;font-weight:bold;color:#9aa0a6;">Clear</span><span style="font-size:24px;font-weight:bold;color:#c0392b;">One</span><br><span style="font-size:11px;color:#9aa0a6;letter-spacing:1px;">Advantage&reg;</span></td></tr>'
 
-  <!-- Two Payment Options -->
-  ${d.term1 || d.term2 ? `
-  <tr><td style="padding:0 30px 14px;">
-    <p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px 0;">Your Program Options</p>
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;">
-      <tr style="background:#1a3a5c;">
-        <td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Term</td>
-        <td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Monthly Payment</td>
-        <td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Monthly Savings</td>
-      </tr>
-      ${d.term1 ? `<tr style="background:#f0faf4;"><td style="padding:10px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;border-bottom:1px solid #eee;">${d.term1} months</td><td style="padding:10px 12px;font-size:14px;font-weight:bold;color:#2e7d32;border-bottom:1px solid #eee;">${fmt(d.payment1)}</td><td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;border-bottom:1px solid #eee;">${fmt(d.savings1)}</td></tr>` : ''}
-      ${d.term2 ? `<tr><td style="padding:10px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;">${d.term2} months</td><td style="padding:10px 12px;font-size:14px;font-weight:bold;color:#2e7d32;">${fmt(d.payment2)}</td><td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;">${fmt(d.savings2)}</td></tr>` : ''}
-    </table>
-  </td></tr>` : ''}
+  // Intro
+  +'<tr><td style="padding:18px 30px 10px;"><p style="font-size:13px;color:#333;margin:0 0 6px;">'+name+',</p><p style="font-size:13px;color:#555;line-height:1.6;margin:0;">Below is a snapshot of your ClearOne Advantage Plan. Your summary includes eligible debts from your credit file and provides a good faith estimate based on your creditors and our actual historical results.</p></td></tr>'
 
-  <!-- Current Payment vs New Payment -->
-  ${d.currentPayments ? `
-  <tr><td style="padding:0 30px 14px;">
-    <p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px 0;">How Your Payment Compares</p>
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;">
-      <tr style="background:#1a3a5c;"><td style="padding:8px 12px;font-size:11px;color:white;font-weight:bold;">Payment</td><td style="padding:8px 12px;font-size:11px;color:white;font-weight:bold;">Amount</td></tr>
-      <tr><td style="padding:9px 12px;font-size:13px;border-bottom:1px solid #eee;">Current Monthly Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#c0392b;border-bottom:1px solid #eee;">${fmt(d.currentPayments)}</td></tr>
-      ${d.payment1 ? `<tr style="background:#f0faf4;"><td style="padding:9px 12px;font-size:13px;font-weight:bold;border-bottom:1px solid #eee;">New ClearOne Program Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#2e7d32;border-bottom:1px solid #eee;">${fmt(d.payment1)}</td></tr>` : ''}
-      ${d.savings1 ? `<tr><td style="padding:9px 12px;font-size:13px;">Monthly Savings</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#2e7d32;">${fmt(d.savings1)}</td></tr>` : ''}
-    </table>
-  </td></tr>` : ''}
+  // Plan Highlights
+  +'<tr><td style="padding:14px 30px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#eef3f8;border-radius:6px;"><tr><td style="padding:18px 20px;text-align:center;"><p style="font-size:20px;font-weight:bold;color:#1a3a5c;margin:0 0 6px;">Plan Highlights for '+name+'</p>'+(d.pay1?'<p style="font-size:13px;color:#555;margin:0 0 14px;">Your new plan payment is <strong style="color:#1a3a5c;">'+fmtMoney(d.pay1)+'</strong>'+(d.sav1?' — that\'s <strong>'+d.sav1+'</strong> less than what your creditors expect today':'')+'</p>':'')+'<table width="100%" cellpadding="4" cellspacing="4" border="0"><tr>'+statBoxes+'</tr></table></td></tr></table></td></tr>'
 
-  <!-- Bar Chart Comparison -->
-  ${d.totalPayoff || d.minimumPayments ? `
-  <tr><td style="padding:0 30px 14px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d2340;border-radius:6px;">
-      <tr><td style="padding:22px 24px;">
-        <p style="color:#ffffff;font-size:13px;text-align:center;margin:0 0 20px 0;">Below shows you how your ClearOne plan compares<br>to other common debt repayment options.</p>
-        ${[
-          {l:'ClearOne', v:fmt(d.estCost||d.totalPayoff), color:'#2196f3'},
-          {l:'DEBT CONSOLIDATION', v:fmt(d.debtConsolidation), color:'#ffc107'},
-          {l:'CREDIT COUNSELING', v:fmt(d.creditCounseling), color:'#ff7043'},
-          {l:'MINIMUM PAYMENTS', v:fmt(d.minimumPayments), color:'#e53935'},
-        ].filter(r=>r.v).map(r=>`
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;">
-          <tr>
-            <td style="width:140px;text-align:right;padding-right:12px;vertical-align:middle;">
-              <span style="font-size:10px;color:#aaaaaa;text-transform:uppercase;">${r.l}</span>
-            </td>
-            <td style="vertical-align:middle;">
-              <div style="background:${r.color};border-radius:3px;height:26px;width:${barPct(r.v)}%;min-width:60px;display:flex;align-items:center;padding:0 10px;">
-                <span style="font-size:11px;font-weight:bold;color:#ffffff;white-space:nowrap;">${r.v}</span>
-              </div>
-            </td>
-          </tr>
-        </table>`).join('')}
-      </td></tr>
-    </table>
-  </td></tr>` : ''}
+  // Program Options
+  +(d.term1||d.term2?'<tr><td style="padding:0 30px 14px;"><p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px;">Your Program Options</p><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;"><tr style="background:#1a3a5c;"><td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Term</td><td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Monthly Payment</td><td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Monthly Savings</td></tr>'+(d.term1?'<tr style="background:#f0faf4;"><td style="padding:10px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;border-bottom:1px solid #eee;">'+d.term1+' months</td><td style="padding:10px 12px;font-size:14px;font-weight:bold;color:#2e7d32;border-bottom:1px solid #eee;">'+fmtMoney(d.pay1)+'</td><td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;border-bottom:1px solid #eee;">'+d.sav1+'</td></tr>':'')+(d.term2?'<tr><td style="padding:10px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;">'+d.term2+' months</td><td style="padding:10px 12px;font-size:14px;font-weight:bold;color:#2e7d32;">'+fmtMoney(d.pay2)+'</td><td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;">'+d.sav2+'</td></tr>':'')+'</table></td></tr>':'')
 
-  <!-- Credit Analysis Header -->
-  <tr><td style="padding:0 30px 14px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1e88e5;border-radius:6px;">
-      <tr><td style="padding:20px;text-align:center;">
-        <p style="font-size:22px;font-weight:bold;color:#ffffff;margin:0 0 4px 0;">Here's your credit analysis!</p>
-        <p style="font-size:13px;font-weight:bold;color:#ffffff;margin:0;">Understanding is the first step in our journey.</p>
-      </td></tr>
-    </table>
-  </td></tr>
+  // Payment Compare
+  +(d.currentPayments?'<tr><td style="padding:0 30px 14px;"><p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px;">How Your Payment Compares</p><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;"><tr style="background:#1a3a5c;"><td style="padding:8px 12px;font-size:11px;color:white;font-weight:bold;">Payment</td><td style="padding:8px 12px;font-size:11px;color:white;font-weight:bold;">Amount</td></tr><tr><td style="padding:9px 12px;font-size:13px;border-bottom:1px solid #eee;">Current Monthly Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#c0392b;border-bottom:1px solid #eee;">'+fmtMoney(d.currentPayments)+'</td></tr>'+(d.pay1?'<tr style="background:#f0faf4;"><td style="padding:9px 12px;font-size:13px;font-weight:bold;border-bottom:1px solid #eee;">New ClearOne Program Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#2e7d32;border-bottom:1px solid #eee;">'+fmtMoney(d.pay1)+'</td></tr>':'')+(d.sav1?'<tr><td style="padding:9px 12px;font-size:13px;">Monthly Savings</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#2e7d32;">'+d.sav1+'</td></tr>':'')+'</table></td></tr>':'')
 
-  <!-- Account Details -->
-  ${acctRows ? `
-  <tr><td style="padding:0 30px 14px;">
-    <p style="font-size:13px;font-weight:bold;color:#1a3a5c;text-align:center;margin:0 0 8px 0;">Account Details for ${name}</p>
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;">
-      <tr style="background:#1a3a5c;">
-        <td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;">Creditor</td>
-        <td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;text-align:center;">Utilization</td>
-        <td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;text-align:center;">Balance</td>
-        <td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;text-align:center;">Min. Payment</td>
-      </tr>
-      ${acctRows}
-    </table>
-  </td></tr>` : ''}
+  // Bar Chart
+  +(bars?'<tr><td style="padding:0 30px 14px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d2340;border-radius:6px;"><tr><td style="padding:22px 24px;"><p style="color:#fff;font-size:13px;text-align:center;margin:0 0 20px;">Below shows you how your ClearOne plan compares<br>to other common debt repayment options.</p>'+bars+'</td></tr></table></td></tr>':'')
 
-  <!-- Credit Utilization + Interest Calculator -->
-  <tr><td style="padding:0 30px 14px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d2340;border-radius:6px;">
-      <tr>
-        <!-- Gauge left -->
-        <td style="padding:20px;vertical-align:top;width:40%;border-right:1px solid #1e3a5c;text-align:center;">
-          <p style="font-size:11px;color:#aaaaaa;text-transform:uppercase;margin:0 0 10px 0;">Credit Utilization</p>
-          <!-- CSS Circle Gauge -->
-          <div style="width:100px;height:100px;border-radius:50%;background:conic-gradient(${gaugeColor} ${pct}%, #2a4a6a ${pct}% 100%);margin:0 auto;display:flex;align-items:center;justify-content:center;">
-            <div style="width:72px;height:72px;background:#0d2340;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-              <span style="color:#ffffff;font-size:16px;font-weight:bold;">${d.activeCredit||activeNum+'%'}</span>
-            </div>
-          </div>
-          <p style="font-size:18px;font-weight:bold;color:#ffffff;margin:10px 0 4px 0;">POOR</p>
-          <p style="font-size:11px;color:#aaaaaa;margin:0;">Remaining: <strong style="color:#ffffff;">${d.remainingCredit||'—'}</strong></p>
-          <p style="font-size:11px;color:#aaaaaa;margin:3px 0 0 0;">Active: <strong style="color:#ffffff;">${d.activeCredit||'—'}</strong></p>
-        </td>
-        <!-- Interest Calculator right -->
-        <td style="padding:20px;vertical-align:top;">
-          <p style="font-size:12px;font-weight:bold;color:#ffffff;margin:0 0 12px 0;">Interest Calculator</p>
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-            ${[
-              {l:'Average Interest Rate', v: d.currentInterest || apr+'%'},
-              {l:"Current Month's Interest", v: interest.monthly},
-              {l:"Current Year's Interest", v: interest.yearly},
-            ].map((r,i)=>`
-            <tr style="background:${i%2===0?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.13)'};">
-              <td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#dce8f5;">${r.l}</td>
-              <td style="padding:9px 12px;font-size:12px;color:#ffffff;text-align:right;">${r.v}</td>
-            </tr>`).join('')}
-          </table>
-        </td>
-      </tr>
-    </table>
-  </td></tr>
+  // Credit Analysis Banner
+  +'<tr><td style="padding:0 30px 14px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1e88e5;border-radius:6px;"><tr><td style="padding:20px;text-align:center;"><p style="font-size:22px;font-weight:bold;color:#fff;margin:0 0 4px;">Here\'s your credit analysis!</p><p style="font-size:13px;font-weight:bold;color:#fff;margin:0;">Understanding is the first step in our journey.</p></td></tr></table></td></tr>'
 
-  <!-- Benefits -->
-  <tr><td style="padding:0 30px 14px;text-align:center;">
-    <p style="font-size:20px;font-weight:bold;color:#1a3a5c;margin:0 0 6px 0;">Benefits*</p>
-    <p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 14px 0;">Some of the Benefits of This Program Could Include:</p>
-    <table width="100%" cellpadding="0" cellspacing="6" border="0">
-      <tr>
-        <td style="width:48%;background:#4cae4c;border-radius:6px;padding:16px 12px;text-align:center;vertical-align:middle;">
-          <p style="font-size:13px;font-weight:bold;color:#ffffff;margin:0;">One single monthly payment.</p>
-        </td>
-        <td style="width:4%;"></td>
-        <td style="width:48%;background:#4cae4c;border-radius:6px;padding:16px 12px;text-align:center;vertical-align:middle;">
-          <p style="font-size:13px;font-weight:bold;color:#ffffff;margin:0;">A reduced principal unsecured debt balance.</p>
-        </td>
-      </tr>
-      <tr><td colspan="3" style="padding-top:6px;">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr><td style="width:25%;"></td>
-          <td style="width:50%;background:#4cae4c;border-radius:6px;padding:16px 12px;text-align:center;">
-            <p style="font-size:13px;font-weight:bold;color:#ffffff;margin:0;">Your enrolled debts should be resolved within an average of 48-60 months.*</p>
-          </td>
-          <td style="width:25%;"></td></tr>
-        </table>
-      </td></tr>
-    </table>
-  </td></tr>
+  // Account Details
+  +(acctRows?'<tr><td style="padding:0 30px 14px;"><p style="font-size:13px;font-weight:bold;color:#1a3a5c;text-align:center;margin:0 0 8px;">Account Details for '+name+'</p><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;"><tr style="background:#1a3a5c;"><td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;">Creditor</td><td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;text-align:center;">Utilization</td><td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;text-align:center;">Balance</td><td style="padding:8px 10px;font-size:11px;color:white;font-weight:bold;text-align:center;">Min. Payment</td></tr>'+acctRows+'</table></td></tr>':'')
 
-  <!-- Trust We've Earned -->
-  <tr><td style="padding:0 30px 14px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f8fa;border-radius:6px;border:1px solid #eee;">
-      <tr><td style="padding:18px;text-align:center;">
-        <p style="font-size:18px;font-weight:bold;color:#1a3a5c;margin:0 0 14px 0;">The Trust We've Earned</p>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td style="text-align:center;padding:0 10px;border-right:1px solid #ddd;">
-              <a href="https://www.trustpilot.com/review/clearoneadvantage.com" style="text-decoration:none;">
-                <p style="font-size:13px;font-weight:bold;color:#00b67a;margin:0;">&#9733; Trustpilot</p>
-                <p style="font-size:13px;color:#f4a71d;margin:3px 0;">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
-                <p style="font-size:10px;color:#555;margin:0;">4.8 &mdash; 8,700+ Reviews</p>
-              </a>
-            </td>
-            <td style="text-align:center;padding:0 10px;border-right:1px solid #ddd;">
-              <p style="font-size:13px;font-weight:bold;color:#4285f4;margin:0;">Google</p>
-              <p style="font-size:13px;color:#f4a71d;margin:3px 0;">&#9733;&#9733;&#9733;&#9733;</p>
-              <p style="font-size:10px;color:#555;margin:0;">4.4 &mdash; 2,800+ Reviews</p>
-            </td>
-            <td style="text-align:center;padding:0 10px;">
-              <a href="https://www.bbb.org/us/az/tempe/profile/debt-relief-services/clearone-advantage-1126-1000124228" style="text-decoration:none;">
-                <p style="font-size:16px;font-weight:bold;color:#003f87;margin:0;">BBB</p>
-                <p style="font-size:18px;font-weight:bold;color:#003f87;margin:2px 0;">A+</p>
-                <p style="font-size:10px;color:#555;margin:0;">Accredited Business</p>
-              </a>
-            </td>
-          </tr>
-        </table>
-      </td></tr>
-    </table>
-  </td></tr>
+  // Credit Util + Interest Calc
+  +'<tr><td style="padding:0 30px 14px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d2340;border-radius:6px;"><tr>'
+  +'<td style="padding:20px;vertical-align:top;width:38%;border-right:1px solid #1e3a5c;text-align:center;"><p style="font-size:11px;color:#aaa;text-transform:uppercase;margin:0 0 10px;">Credit Utilization</p>'
+  +'<div style="width:100px;height:100px;border-radius:50%;background:conic-gradient('+gcolor+' '+pct+'%, #2a4a6a '+pct+'% 100%);margin:0 auto;display:flex;align-items:center;justify-content:center;">'
+  +'<div style="width:72px;height:72px;background:#0d2340;border-radius:50%;display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-size:16px;font-weight:bold;">'+(d.activeCredit||activeNum+'%')+'</span></div></div>'
+  +'<p style="font-size:18px;font-weight:bold;color:#fff;margin:10px 0 4px;">POOR</p>'
+  +'<p style="font-size:11px;color:#aaa;margin:0;">Remaining: <strong style="color:#fff;">'+(d.remainingCredit||'—')+'</strong></p>'
+  +'<p style="font-size:11px;color:#aaa;margin:3px 0 0;">Active: <strong style="color:#fff;">'+(d.activeCredit||'—')+'</strong></p></td>'
+  +'<td style="padding:20px;vertical-align:top;"><p style="font-size:12px;font-weight:bold;color:#fff;margin:0 0 12px;">Interest Calculator</p>'
+  +'<table width="100%" cellpadding="0" cellspacing="0" border="0">'
+  +'<tr style="background:rgba(255,255,255,0.07);"><td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#dce8f5;">Average Interest Rate</td><td style="padding:9px 12px;font-size:12px;color:#fff;text-align:right;">'+(d.currentInterest||apr+'%')+'</td></tr>'
+  +'<tr style="background:rgba(255,255,255,0.13);"><td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#dce8f5;">Current Month\'s Interest</td><td style="padding:9px 12px;font-size:12px;color:#fff;text-align:right;">'+int.mo+'</td></tr>'
+  +'<tr style="background:rgba(255,255,255,0.07);"><td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#dce8f5;">Current Year\'s Interest</td><td style="padding:9px 12px;font-size:12px;color:#fff;text-align:right;">'+int.yr+'</td></tr>'
+  +'</table>'
+  +(estRows?'<p style="font-size:12px;font-weight:bold;color:#fff;margin:14px 0 8px;">Program Estimate for '+name+'</p><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="background:#1a3a5c;"><td style="padding:6px 8px;font-size:10px;color:white;text-align:center;">Terms</td><td style="padding:6px 8px;font-size:10px;color:white;text-align:center;">Monthly Cost</td><td style="padding:6px 8px;font-size:10px;color:white;text-align:center;">Monthly Savings</td><td style="padding:6px 8px;font-size:10px;color:white;text-align:center;">Annual Savings</td></tr>'+estRows+'</table>':'')
+  +'</td></tr></table></td></tr>'
 
-  <!-- Signature -->
-  <tr><td style="padding:16px 30px;border-top:2px solid #1a3a5c;">
-    <p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0;">Daniel Rodriguez | Certified Debt Consultant</p>
-    <p style="font-size:12px;color:#333;margin:4px 0 0 0;">844-931-2650</p>
-    <p style="font-size:12px;margin:3px 0 0 0;"><a href="mailto:drodriguez@clearoneadvantage.com" style="color:#1a3a5c;text-decoration:none;">drodriguez@clearoneadvantage.com</a></p>
-    <p style="font-size:12px;margin:3px 0 0 0;"><a href="https://www.clearoneadvantage.com" style="color:#c0392b;text-decoration:none;font-weight:bold;">ClearOne Advantage</a></p>
-    <p style="font-size:11px;color:#888;margin:4px 0 0 0;font-style:italic;">We help people in debt find a clear path to financial stability.</p>
-  </td></tr>
+  // Benefits
+  +'<tr><td style="padding:0 30px 14px;text-align:center;"><p style="font-size:20px;font-weight:bold;color:#1a3a5c;margin:0 0 6px;">Benefits*</p><p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 14px;">Some of the Benefits of This Program Could Include:</p>'
+  +'<table width="100%" cellpadding="0" cellspacing="6" border="0"><tr>'
+  +'<td style="width:48%;background:#4cae4c;border-radius:6px;padding:16px;text-align:center;"><p style="font-size:13px;font-weight:bold;color:#fff;margin:0;">One single monthly payment.</p></td>'
+  +'<td style="width:4%;"></td>'
+  +'<td style="width:48%;background:#4cae4c;border-radius:6px;padding:16px;text-align:center;"><p style="font-size:13px;font-weight:bold;color:#fff;margin:0;">A reduced principal unsecured debt balance.</p></td>'
+  +'</tr><tr><td colspan="3" style="padding-top:6px;"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
+  +'<td style="width:20%;"></td>'
+  +'<td style="width:60%;background:#4cae4c;border-radius:6px;padding:16px;text-align:center;"><p style="font-size:13px;font-weight:bold;color:#fff;margin:0;">Your enrolled debts should be resolved within an average of 48-60 months.*</p></td>'
+  +'<td style="width:20%;"></td>'
+  +'</tr></table></td></tr></table></td></tr>'
 
-  <!-- Disclaimer -->
-  <tr><td style="padding:12px 30px;background:#f5f5f5;border-top:1px solid #ddd;">
-    <p style="font-size:9px;color:#999;line-height:1.6;text-align:center;">ClearOne Advantage, LLC is a debt settlement company, not a lender, loan broker, creditor, or debt collector. Entering into a debt settlement program could adversely affect your credit score. Not all clients complete their program. Individual results may vary. Not available in all states. 410 N Scottsdale Rd, Suite 1000, Tempe, AZ 85281 | C.P.D. Reg. No. T.S. 12-03822 | <a href="https://www.clearoneadvantage.com" style="color:#999;">www.clearoneadvantage.com</a></p>
-  </td></tr>
+  // Trust
+  +'<tr><td style="padding:0 30px 14px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f8fa;border-radius:6px;border:1px solid #eee;"><tr><td style="padding:18px;text-align:center;"><p style="font-size:18px;font-weight:bold;color:#1a3a5c;margin:0 0 14px;">The Trust We\'ve Earned</p><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
+  +'<td style="text-align:center;padding:0 10px;border-right:1px solid #ddd;"><a href="https://www.trustpilot.com/review/clearoneadvantage.com" style="text-decoration:none;"><p style="font-size:13px;font-weight:bold;color:#00b67a;margin:0;">&#9733; Trustpilot</p><p style="font-size:13px;color:#f4a71d;margin:3px 0;">&#9733;&#9733;&#9733;&#9733;&#9733;</p><p style="font-size:10px;color:#555;margin:0;">4.8 &mdash; 8,700+ Reviews</p></a></td>'
+  +'<td style="text-align:center;padding:0 10px;border-right:1px solid #ddd;"><p style="font-size:13px;font-weight:bold;color:#4285f4;margin:0;">Google</p><p style="font-size:13px;color:#f4a71d;margin:3px 0;">&#9733;&#9733;&#9733;&#9733;</p><p style="font-size:10px;color:#555;margin:0;">4.4 &mdash; 2,800+ Reviews</p></td>'
+  +'<td style="text-align:center;padding:0 10px;"><a href="https://www.bbb.org/us/az/tempe/profile/debt-relief-services/clearone-advantage-1126-1000124228" style="text-decoration:none;"><p style="font-size:16px;font-weight:bold;color:#003f87;margin:0;">BBB</p><p style="font-size:18px;font-weight:bold;color:#003f87;margin:2px 0;">A+</p><p style="font-size:10px;color:#555;margin:0;">Accredited Business</p></a></td>'
+  +'</tr></table></td></tr></table></td></tr>'
 
-</table>`;
+  // Signature
+  +'<tr><td style="padding:16px 30px;border-top:2px solid #1a3a5c;"><p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0;">Daniel Rodriguez | Certified Debt Consultant</p><p style="font-size:12px;color:#333;margin:4px 0 0;">844-931-2650</p><p style="font-size:12px;margin:3px 0 0;"><a href="mailto:drodriguez@clearoneadvantage.com" style="color:#1a3a5c;text-decoration:none;">drodriguez@clearoneadvantage.com</a></p><p style="font-size:12px;margin:3px 0 0;"><a href="https://www.clearoneadvantage.com" style="color:#c0392b;text-decoration:none;font-weight:bold;">ClearOne Advantage</a></p><p style="font-size:11px;color:#888;margin:4px 0 0;font-style:italic;">We help people in debt find a clear path to financial stability.</p></td></tr>'
+
+  // Disclaimer
+  +'<tr><td style="padding:12px 30px;background:#f5f5f5;border-top:1px solid #ddd;"><p style="font-size:9px;color:#999;line-height:1.6;text-align:center;">ClearOne Advantage, LLC is a debt settlement company, not a lender, loan broker, creditor, or debt collector. Entering into a debt settlement program could adversely affect your credit score. Not all clients complete their program. Individual results may vary. Not available in all states. 410 N Scottsdale Rd, Suite 1000, Tempe, AZ 85281 | C.P.D. Reg. No. T.S. 12-03822 | <a href="https://www.clearoneadvantage.com" style="color:#999;">www.clearoneadvantage.com</a></p></td></tr>'
+
+  +'</table>';
 }
 </script>
 </body>
