@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Allow browser requests
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -19,8 +18,21 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    res.status(response.status).json(data);
+
+    // Log for debugging
+    console.log('Anthropic response status:', response.status);
+    console.log('Anthropic response:', JSON.stringify(data).slice(0, 500));
+
+    if (!response.ok) {
+      return res.status(response.status).json({ 
+        error: data.error?.message || 'Anthropic API error',
+        full: data 
+      });
+    }
+
+    res.status(200).json(data);
   } catch (err) {
+    console.error('Handler error:', err);
     res.status(500).json({ error: err.message });
   }
 }
