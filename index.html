@@ -256,7 +256,7 @@ function buildEmail(d) {
   var gcolor = pct > 90 ? '#c0392b' : pct > 70 ? '#e67e22' : '#2e7d32';
 
   var estCostFmt  = fmtMoney(d.estCost || d.totalPayoff);
-  var eligDebtFmt = fmtMoney(d.eligibleDebt);
+  var eligDebtFmt = fmtMoney(d.eligibleDebt || d.currentBalance);
 
   // Savings calculations for Individual Summary
   var timeSaved    = subtractMonths(d.estTimeToPayOff, d.term1);
