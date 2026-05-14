@@ -21,9 +21,8 @@ header p { font-size: 13px; opacity: 0.7; margin-top: 3px; }
 .thumb button { position: absolute; top: -6px; right: -6px; background: #c0392b; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; }
 .sec-label { font-size: 13px; font-weight: bold; color: #1a3a5c; margin: 16px 0 8px; padding-left: 8px; border-left: 3px solid #1a3a5c; }
 .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 label { font-size: 12px; font-weight: bold; color: #555; display: block; margin-bottom: 4px; }
-input, select { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+input { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
 .ro { background: #f5f5f5; color: #2e7d32; font-weight: bold; }
 .btn-gen { background: #1a7a4a; color: white; border: none; padding: 13px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 16px; }
 .btn-gen:disabled { background: #999; cursor: not-allowed; }
@@ -32,26 +31,23 @@ input, select { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-r
 #status { font-size: 13px; color: #1a7a4a; font-weight: bold; margin-top: 10px; min-height: 18px; }
 #errmsg { font-size: 13px; color: #c0392b; margin-top: 6px; }
 #output { display: none; }
-#frame { width: 100%; height: 900px; border: 1px solid #ddd; border-radius: 6px; margin-top: 14px; }
+#frame { width: 100%; height: 950px; border: 1px solid #ddd; border-radius: 6px; margin-top: 14px; }
 .howto { background: #e8f5ee; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; }
 .howto ol { font-size: 13px; color: #444; padding-left: 18px; line-height: 2.2; }
 </style>
 </head>
 <body>
-
 <header>
   <h1>ClearOne Advantage — Email Generator</h1>
   <p>Upload screenshots + fill in details → Generate client email</p>
 </header>
-
 <div class="wrap">
   <div class="card">
     <h2>Step 1 — Upload Screenshots &amp; Fill In Details</h2>
-
     <div class="drop-zone" id="dz">
       <div style="font-size:30px">📸</div>
       <strong>Click to upload or drag &amp; drop screenshots</strong>
-      <p style="font-size:13px;color:#666;margin-top:5px">Current Financial Path, Account Details, etc.</p>
+      <p style="font-size:13px;color:#666;margin-top:5px">Upload all slides: Current Financial Path, Account Details, Individual Summary, etc.</p>
       <input type="file" id="fi" accept="image/*" multiple>
     </div>
     <div class="previews" id="previews"></div>
@@ -60,7 +56,7 @@ input, select { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-r
     <div class="grid3">
       <div><label>Client Name</label><input id="cname" placeholder="e.g. CaTronna Verrett"></div>
       <div><label>Current Monthly Payment</label><input id="currpay" placeholder="e.g. 662.00" oninput="autoSavings()"></div>
-      <div><label>Estimated Cost to Client</label><input id="estcost" placeholder="e.g. $38,534.26"></div>
+      <div><label>Estimated Cost to Client</label><input id="estcost" placeholder="e.g. 38534.26" oninput="autoSavings()"></div>
     </div>
 
     <div class="sec-label">Program Option 1</div>
@@ -109,12 +105,11 @@ function addFiles(list) {
   for (var i=0; i<list.length; i++) {
     if (!list[i].type.startsWith('image/')) continue;
     files.push(list[i]);
-    (function(f, idx){
+    (function(f,idx){
       var r = new FileReader();
       r.onload = function(e){
-        var d = document.createElement('div');
-        d.className = 'thumb';
-        d.innerHTML = '<img src="'+e.target.result+'"><button onclick="removeFile('+idx+')">x</button>';
+        var d = document.createElement('div'); d.className='thumb';
+        d.innerHTML='<img src="'+e.target.result+'"><button onclick="removeFile('+idx+')">x</button>';
         document.getElementById('previews').appendChild(d);
       };
       r.readAsDataURL(f);
@@ -123,15 +118,13 @@ function addFiles(list) {
 }
 
 function removeFile(idx) {
-  files.splice(idx, 1);
-  var p = document.getElementById('previews');
-  p.innerHTML = '';
-  files.forEach(function(f, i){
-    var r = new FileReader();
-    r.onload = function(e){
-      var d = document.createElement('div');
-      d.className = 'thumb';
-      d.innerHTML = '<img src="'+e.target.result+'"><button onclick="removeFile('+i+')">x</button>';
+  files.splice(idx,1);
+  var p=document.getElementById('previews'); p.innerHTML='';
+  files.forEach(function(f,i){
+    var r=new FileReader();
+    r.onload=function(e){
+      var d=document.createElement('div'); d.className='thumb';
+      d.innerHTML='<img src="'+e.target.result+'"><button onclick="removeFile('+i+')">x</button>';
       p.appendChild(d);
     };
     r.readAsDataURL(f);
@@ -143,65 +136,69 @@ function autoSavings() {
   var p1   = parseFloat(document.getElementById('pay1').value.replace(/[^0-9.]/g,''));
   var p2   = parseFloat(document.getElementById('pay2').value.replace(/[^0-9.]/g,''));
   function f(n){ return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-  if (curr && p1 && curr > p1) document.getElementById('sav1').value = f(curr-p1);
-  if (curr && p2 && curr > p2) document.getElementById('sav2').value = f(curr-p2);
+  if (curr && p1 && curr>p1) document.getElementById('sav1').value = f(curr-p1);
+  if (curr && p2 && curr>p2) document.getElementById('sav2').value = f(curr-p2);
 }
 
 function toB64(file) {
   return new Promise(function(res,rej){
-    var r = new FileReader();
-    r.onload = function(){ res(r.result.split(',')[1]); };
-    r.onerror = rej;
+    var r=new FileReader();
+    r.onload=function(){ res(r.result.split(',')[1]); };
+    r.onerror=rej;
     r.readAsDataURL(file);
   });
 }
 
 function fmtMoney(v) {
   if (!v) return '';
-  var s = v.toString().replace(/[^0-9.]/g,'');
+  var s=v.toString().replace(/[^0-9.]/g,'');
   if (!s) return '';
-  var n = parseFloat(s);
+  var n=parseFloat(s);
   if (isNaN(n)) return v;
   return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
-function calcInterest(bal, apr) {
-  var b = parseFloat((bal||'0').replace(/[^0-9.]/g,''));
-  var r = parseFloat((apr||'28').replace(/[^0-9.]/g,''))/100;
+function calcInterest(bal,apr) {
+  var b=parseFloat((bal||'0').replace(/[^0-9.]/g,''));
+  var r=parseFloat((apr||'28').replace(/[^0-9.]/g,''))/100;
   if (!b||!r) return {mo:'—',yr:'—'};
-  var daily = r/365;
-  var mo = b*(Math.pow(1+daily,30)-1);
-  var yr = b*(Math.pow(1+daily,365)-1);
+  var daily=r/365;
+  var mo=b*(Math.pow(1+daily,30)-1);
+  var yr=b*(Math.pow(1+daily,365)-1);
   function f(n){ return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-  return {mo:f(mo), yr:f(yr)};
+  return {mo:f(mo),yr:f(yr)};
+}
+
+function subtractMoney(a,b) {
+  var na=parseFloat((a||'0').replace(/[^0-9.]/g,''));
+  var nb=parseFloat((b||'0').replace(/[^0-9.]/g,''));
+  if (!na||!nb) return '—';
+  var diff=na-nb;
+  if (diff<=0) return '—';
+  return '$'+diff.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
 async function go() {
-  document.getElementById('errmsg').textContent = '';
-  if (files.length === 0) { document.getElementById('errmsg').textContent = 'Please upload at least one screenshot.'; return; }
-  var btn = document.getElementById('genbtn');
-  btn.disabled = true; btn.textContent = 'AI reading screenshots...';
-  document.getElementById('status').textContent = 'Sending to AI...';
-
+  document.getElementById('errmsg').textContent='';
+  if (files.length===0){ document.getElementById('errmsg').textContent='Please upload at least one screenshot.'; return; }
+  var btn=document.getElementById('genbtn');
+  btn.disabled=true; btn.textContent='AI reading screenshots...';
+  document.getElementById('status').textContent='Sending to AI...';
   try {
-    var content = [];
-    for (var i=0; i<files.length; i++) {
-      var b64 = await toB64(files[i]);
+    var content=[];
+    for (var i=0;i<files.length;i++){
+      var b64=await toB64(files[i]);
       content.push({type:'image',source:{type:'base64',media_type:files[i].type,data:b64}});
     }
-    var cname = document.getElementById('cname').value.trim() || 'Valued Client';
-    content.push({type:'text',text:'Extract financial data from these ClearOne Advantage screenshots for client: '+cname+'. Return ONLY valid JSON with these fields: {"clientName":"","currentBalance":"","currentInterest":"","currentPayments":"","currentPathMonths":"","interestPaid":"","totalAmountPaid":"","eligibleDebt":"","totalPayoff":"","debtConsolidation":"","creditCounseling":"","minimumPayments":"","activeCredit":"","remainingCredit":"","accounts":[{"creditor":"","utilization":"","balance":"","minPayment":""}],"estimates":[{"term":"","cost":"","savings":"","annualSavings":""}]} IMPORTANT: totalAmountPaid = the "Total Amount Paid" number from the Current Financial Path section. minimumPayments = the MINIMUM PAYMENTS comparison value. debtConsolidation = DEBT CONSOLIDATION comparison value. creditCounseling = CREDIT COUNSELING comparison value. Return ONLY the JSON object, nothing else.'});
+    var cname=document.getElementById('cname').value.trim()||'Valued Client';
+    content.push({type:'text',text:'Extract financial data from these ClearOne Advantage screenshots for client: '+cname+'. Return ONLY valid JSON: {"clientName":"","currentBalance":"","currentInterest":"","currentPayments":"","currentPathMonths":"","interestPaid":"","totalAmountPaid":"","eligibleDebt":"","totalPayoff":"","debtConsolidation":"","creditCounseling":"","minimumPayments":"","activeCredit":"","remainingCredit":"","estTimeToPayOff":"","estTotalPayments":"","estTimeSaved":"","estTotalSaved":"","estMonthlySaved":"","accounts":[{"creditor":"","utilization":"","balance":"","minPayment":""}],"estimates":[{"term":"","cost":"","savings":"","annualSavings":""}]} IMPORTANT: totalAmountPaid=Total Amount Paid from Current Financial Path. minimumPayments=MINIMUM PAYMENTS comparison. debtConsolidation=DEBT CONSOLIDATION value. creditCounseling=CREDIT COUNSELING value. estTimeToPayOff=Current Situation time to pay off. estTotalPayments=Current Situation Est Total Payments dollar amount. estTimeSaved=Estimated Relief time saved. estTotalSaved=Estimated Relief total payments saved. estMonthlySaved=Estimated Relief monthly saved. Do NOT extract Proposed Terms monthly payment. Return ONLY JSON.'});
 
-    var resp = await fetch('/api/chat', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:2000,messages:[{role:'user',content:content}]})
-    });
-    var data = await resp.json();
+    var resp=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:2000,messages:[{role:'user',content:content}]})});
+    var data=await resp.json();
     if (!data.content) throw new Error('API Error: '+JSON.stringify(data));
-    var raw = data.content.map(function(c){return c.text||'';}).join('');
-    var clean = raw.replace(/```json|```/g,'').trim();
-    var d = JSON.parse(clean);
+    var raw=data.content.map(function(c){return c.text||'';}).join('');
+    var clean=raw.replace(/```json|```/g,'').trim();
+    var d=JSON.parse(clean);
 
     d.clientName    = cname;
     d.estCost       = document.getElementById('estcost').value.trim();
@@ -212,87 +209,209 @@ async function go() {
     d.term2         = document.getElementById('term2').value.trim();
     d.pay2          = document.getElementById('pay2').value.trim();
     d.sav2          = document.getElementById('sav2').value.trim();
-    if (d.manualCurrPay) d.currentPayments = d.manualCurrPay;
+    if (d.manualCurrPay) d.currentPayments=d.manualCurrPay;
 
-    document.getElementById('status').textContent = 'Building email...';
-    var html = buildEmail(d);
-    window._html = html;
-
-    var fr = document.getElementById('frame');
-    var doc = fr.contentDocument || fr.contentWindow.document;
+    document.getElementById('status').textContent='Building email...';
+    var html=buildEmail(d);
+    window._html=html;
+    var fr=document.getElementById('frame');
+    var doc=fr.contentDocument||fr.contentWindow.document;
     doc.open(); doc.write('<!DOCTYPE html><html><body style="margin:0;padding:0;">'+html+'</body></html>'); doc.close();
-    document.getElementById('output').style.display = 'block';
+    document.getElementById('output').style.display='block';
     document.getElementById('output').scrollIntoView({behavior:'smooth'});
-    document.getElementById('status').textContent = 'Email generated!';
-  } catch(e) {
-    document.getElementById('errmsg').textContent = 'Error: '+e.message;
-    document.getElementById('status').textContent = '';
+    document.getElementById('status').textContent='Email generated!';
+  } catch(e){
+    document.getElementById('errmsg').textContent='Error: '+e.message;
+    document.getElementById('status').textContent='';
   }
-  btn.disabled = false; btn.textContent = 'Generate Email →';
+  btn.disabled=false; btn.textContent='Generate Email →';
 }
 
-function dlEml() {
+function dlEml(){
   if (!window._html) return;
-  var eml = 'MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nX-Unsent: 1\r\nSubject: Your ClearOne Advantage Debt Relief Plan\r\nTo: \r\n\r\n'+window._html;
-  var blob = new Blob([eml],{type:'message/rfc822'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
+  var eml='MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nX-Unsent: 1\r\nSubject: Your ClearOne Advantage Debt Relief Plan\r\nTo: \r\n\r\n'+window._html;
+  var blob=new Blob([eml],{type:'message/rfc822'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
   a.href=url; a.download='client-plan.eml'; a.click();
   URL.revokeObjectURL(url);
 }
 
-function newTab() {
+function newTab(){
   if (!window._html) return;
-  var w = window.open('','_blank');
+  var w=window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;">'+window._html+'</body></html>');
   w.document.close();
 }
 
 function buildEmail(d) {
-  var name = d.clientName || 'Valued Client';
-  var apr  = parseFloat((d.currentInterest||'28').replace(/[^0-9.]/g,''))||28;
-  var bal  = d.currentBalance||d.eligibleDebt||'';
-  var int  = calcInterest(bal, apr.toString());
-  var activeNum = parseFloat((d.activeCredit||'0').replace(/[^0-9.]/g,''))||0;
-  var pct  = Math.min(activeNum,100);
-  var gcolor = pct>90?'#c0392b':pct>70?'#e67e22':'#2e7d32';
+  var name=d.clientName||'Valued Client';
+  var apr=parseFloat((d.currentInterest||'28').replace(/[^0-9.]/g,''))||28;
+  var bal=d.currentBalance||d.eligibleDebt||'';
+  var int=calcInterest(bal,apr.toString());
+  var activeNum=parseFloat((d.activeCredit||'0').replace(/[^0-9.]/g,''))||0;
+  var pct=Math.min(activeNum,100);
+  var gcolor=pct>90?'#c0392b':pct>70?'#e67e22':'#2e7d32';
 
-  var maxVal = Math.max(
+  // Total savings for each option = totalAmountPaid minus estCost (same for both since same program cost)
+  var totalPaidBase = d.totalAmountPaid||d.minimumPayments||'';
+  var estTotalSav1 = subtractMoney(totalPaidBase, d.estCost||d.totalPayoff);
+  var estTotalSav2 = subtractMoney(totalPaidBase, d.estCost||d.totalPayoff);
+
+  var maxVal=Math.max(
     parseFloat((d.minimumPayments||d.totalAmountPaid||'0').replace(/[^0-9,]/g,'')),
     parseFloat((d.debtConsolidation||'0').replace(/[^0-9,]/g,'')),
     parseFloat((d.creditCounseling||'0').replace(/[^0-9,]/g,'')),
     parseFloat((d.estCost||d.totalPayoff||'0').replace(/[^0-9,]/g,'')),
     1
-  ) || 150000;
+  )||150000;
   function bpct(v){ var n=parseFloat((v||'0').replace(/[^0-9,]/g,'')); return Math.max(10,Math.round((n/maxVal)*82)); }
 
-  var acctRows = (d.accounts||[]).map(function(a,i){
-    var u = a.utilization?parseInt(a.utilization):0;
-    var uc = u>100?'#c0392b':u>75?'#e67e22':'#2e7d32';
-    return '<tr style="background:'+(i%2===0?'#fff':'#f5f8fa')+';"><td style="padding:7px 10px;font-size:11px;color:#1a3a5c;border-bottom:1px solid #eee;">'+( a.creditor||'')+'</td><td style="padding:7px 10px;font-size:11px;font-weight:bold;color:'+uc+';border-bottom:1px solid #eee;text-align:center;">'+(a.utilization||'—')+'</td><td style="padding:7px 10px;font-size:11px;font-weight:bold;color:#1a3a5c;border-bottom:1px solid #eee;text-align:center;">'+fmtMoney(a.balance)+'</td><td style="padding:7px 10px;font-size:11px;color:#555;border-bottom:1px solid #eee;text-align:center;">'+fmtMoney(a.minPayment)+'</td></tr>';
+  var acctRows=(d.accounts||[]).map(function(a,i){
+    var u=a.utilization?parseInt(a.utilization):0;
+    var uc=u>100?'#c0392b':u>75?'#e67e22':'#2e7d32';
+    return '<tr style="background:'+(i%2===0?'#fff':'#f5f8fa')+';">'
+      +'<td style="padding:7px 10px;font-size:11px;color:#1a3a5c;border-bottom:1px solid #eee;">'+(a.creditor||'')+'</td>'
+      +'<td style="padding:7px 10px;font-size:11px;font-weight:bold;color:'+uc+';border-bottom:1px solid #eee;text-align:center;">'+(a.utilization||'—')+'</td>'
+      +'<td style="padding:7px 10px;font-size:11px;font-weight:bold;color:#1a3a5c;border-bottom:1px solid #eee;text-align:center;">'+fmtMoney(a.balance)+'</td>'
+      +'<td style="padding:7px 10px;font-size:11px;color:#555;border-bottom:1px solid #eee;text-align:center;">'+fmtMoney(a.minPayment)+'</td>'
+      +'</tr>';
   }).join('');
 
-  var estRows = (d.estimates||[]).map(function(e,i){
-    return '<tr style="background:'+(i%2===0?'rgba(255,255,255,0.06)':'rgba(255,255,255,0.12)')+'"><td style="padding:7px 8px;font-size:11px;color:#fff;text-align:center;">'+e.term+'</td><td style="padding:7px 8px;font-size:11px;color:#4cd4a0;font-weight:bold;text-align:center;">'+e.cost+'</td><td style="padding:7px 8px;font-size:11px;color:#fff;text-align:center;">'+e.savings+'</td><td style="padding:7px 8px;font-size:11px;color:#4cd4a0;font-weight:bold;text-align:center;">'+e.annualSavings+'</td></tr>';
+  var estRows=(d.estimates||[]).map(function(e,i){
+    return '<tr style="background:'+(i%2===0?'rgba(255,255,255,0.06)':'rgba(255,255,255,0.12)')+';">'
+      +'<td style="padding:7px 8px;font-size:11px;color:#fff;text-align:center;">'+e.term+'</td>'
+      +'<td style="padding:7px 8px;font-size:11px;color:#4cd4a0;font-weight:bold;text-align:center;">'+e.cost+'</td>'
+      +'<td style="padding:7px 8px;font-size:11px;color:#fff;text-align:center;">'+e.savings+'</td>'
+      +'<td style="padding:7px 8px;font-size:11px;color:#4cd4a0;font-weight:bold;text-align:center;">'+e.annualSavings+'</td>'
+      +'</tr>';
   }).join('');
 
-  var bars = [
-    {l:'ClearOne', v:fmtMoney(d.estCost||d.totalPayoff), c:'#2196f3'},
-    {l:'DEBT CONSOLIDATION', v:fmtMoney(d.debtConsolidation), c:'#ffc107'},
-    {l:'CREDIT COUNSELING', v:fmtMoney(d.creditCounseling), c:'#ff7043'},
-    {l:'MINIMUM PAYMENTS', v:fmtMoney(d.minimumPayments||d.totalAmountPaid), c:'#e53935'},
+  var bars=[
+    {l:'ClearOne',v:fmtMoney(d.estCost||d.totalPayoff),c:'#2196f3'},
+    {l:'DEBT CONSOLIDATION',v:fmtMoney(d.debtConsolidation),c:'#ffc107'},
+    {l:'CREDIT COUNSELING',v:fmtMoney(d.creditCounseling),c:'#ff7043'},
+    {l:'MINIMUM PAYMENTS',v:fmtMoney(d.minimumPayments||d.totalAmountPaid),c:'#e53935'},
   ].filter(function(r){return r.v;}).map(function(r){
-    return '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:11px;"><tr><td style="width:140px;text-align:right;padding-right:12px;vertical-align:middle;"><span style="font-size:10px;color:#aaa;text-transform:uppercase;">'+r.l+'</span></td><td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="background:'+r.c+';border-radius:3px;height:26px;width:'+(bpct(r.v)*5)+'px;padding:0 10px;vertical-align:middle;"><span style="font-size:11px;font-weight:bold;color:#fff;white-space:nowrap;">'+r.v+'</span></td></tr></table></td></tr></table>';
+    return '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:11px;"><tr>'
+      +'<td style="width:140px;text-align:right;padding-right:12px;vertical-align:middle;"><span style="font-size:10px;color:#aaa;text-transform:uppercase;">'+r.l+'</span></td>'
+      +'<td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0"><tr>'
+      +'<td style="background:'+r.c+';border-radius:3px;height:26px;width:'+(bpct(r.v)*5)+'px;padding:0 10px;vertical-align:middle;">'
+      +'<span style="font-size:11px;font-weight:bold;color:#fff;white-space:nowrap;">'+r.v+'</span>'
+      +'</td></tr></table></td></tr></table>';
   }).join('');
 
-  var statBoxes = [
-    {l:'plan eligible debt', v:fmtMoney(d.eligibleDebt)},
-    {l:'new plan payment', v:fmtMoney(d.pay1)},
-    {l:'estimated program length', v: d.term1?d.term1+' months':''},
-    {l:'estimated total cost', v:fmtMoney(d.estCost||d.totalPayoff)}
-  ].filter(function(x){return x.v;}).map(function(x){
-    return '<td style="background:#fff;border:1px solid #dde3ea;border-radius:6px;padding:12px 6px;text-align:center;vertical-align:top;"><p style="font-size:17px;font-weight:bold;color:#1a3a5c;margin:0;">'+x.v+'</p><p style="font-size:10px;color:#777;margin:4px 0 0 0;">'+x.l+'</p></td>';
-  }).join('');
+  // Plan Highlights — two rows, one per option, 4 boxes each
+  var eligDebt = fmtMoney(d.eligibleDebt);
+  var estCostFmt = fmtMoney(d.estCost||d.totalPayoff);
+  function makeRow(payAmt, termAmt) {
+    return [
+      {l:'total debt', v:eligDebt},
+      {l:'new plan payment', v:fmtMoney(payAmt)},
+      {l:'estimated program length', v:termAmt?termAmt+' months':''},
+      {l:'estimated total cost', v:estCostFmt}
+    ].filter(function(x){return x.v;}).map(function(x){
+      return '<td style="background:#fff;border:1px solid #dde3ea;border-radius:6px;padding:12px 6px;text-align:center;vertical-align:top;width:25%;">'
+        +'<p style="font-size:17px;font-weight:bold;color:#1a3a5c;margin:0;">'+x.v+'</p>'
+        +'<p style="font-size:10px;color:#777;margin:4px 0 0;">'+x.l+'</p>'
+        +'</td>';
+    }).join('');
+  }
+  var row1Boxes = makeRow(d.pay1, d.term1);
+  var row2Boxes = makeRow(d.pay2, d.term2);
+
+  // Individual Summary — both options side by side
+  var hasSummary = d.estTimeToPayOff||d.estTotalPayments;
+  var summarySection = !hasSummary ? '' :
+    '<tr><td style="padding:0 30px 14px;">'
+    +'<p style="font-size:15px;font-weight:bold;color:#1a3a5c;margin:0 0 10px;">Individual Summary*</p>'
+    +'<p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px;">Your Current Balance</p>'
+    +'<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;">'
+    // Header row
+    +'<tr style="background:#f0f4f8;">'
+    +'<td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#333;width:28%;border-right:1px solid #ddd;"></td>'
+    +'<td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#333;text-align:center;border-right:1px solid #ddd;">Current Situation</td>'
+    +'<td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#1a7a4a;text-align:center;border-right:1px solid #ddd;">'+(d.term1?'Option 1 ('+d.term1+' mo.)':'Option 1')+'</td>'
+    +'<td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#1a3a5c;text-align:center;border-right:1px solid #ddd;">'+(d.term2?'Option 2 ('+d.term2+' mo.)':'Option 2')+'</td>'
+    +'<td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#c0392b;text-align:center;">Estimated Relief</td>'
+    +'</tr>'
+    // Time to pay off
+    +(d.estTimeToPayOff?
+      '<tr>'
+      +'<td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#1a3a5c;border-right:1px solid #ddd;border-bottom:1px solid #eee;">Est. Time to Pay Off*</td>'
+      +'<td style="padding:9px 12px;font-size:12px;color:#c0392b;text-align:center;border-right:1px solid #ddd;border-bottom:1px solid #eee;">'+d.estTimeToPayOff+'</td>'
+      +'<td style="padding:9px 12px;font-size:12px;color:#2e7d32;font-weight:bold;text-align:center;border-right:1px solid #ddd;border-bottom:1px solid #eee;">'+(d.term1?d.term1+' Months':'—')+'</td>'
+      +'<td style="padding:9px 12px;font-size:12px;color:#1a3a5c;font-weight:bold;text-align:center;border-right:1px solid #ddd;border-bottom:1px solid #eee;">'+(d.term2?d.term2+' Months':'—')+'</td>'
+      +'<td style="padding:9px 12px;font-size:12px;color:#2e7d32;font-weight:bold;text-align:center;border-bottom:1px solid #eee;">'+(d.estTimeSaved||'—')+'</td>'
+      +'</tr>':'')
+    // Est Total Payments
+    +(d.estTotalPayments?
+      '<tr>'
+      +'<td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#1a3a5c;border-right:1px solid #ddd;border-bottom:1px solid #eee;">Est. Total Payments*</td>'
+      +'<td style="padding:9px 12px;font-size:12px;color:#c0392b;text-align:center;border-right:1px solid #ddd;border-bottom:1px solid #eee;">'+fmtMoney(d.estTotalPayments)+'</td>'
+      +'<td style="padding:9px 12px;font-size:12px;color:#2e7d32;font-weight:bold;text-align:center;border-right:1px solid #ddd;border-bottom:1px solid #eee;">'+fmtMoney(d.estCost||d.totalPayoff)+'</td>'
+      +'<td style="padding:9px 12px;font-size:12px;color:#1a3a5c;font-weight:bold;text-align:center;border-right:1px solid #ddd;border-bottom:1px solid #eee;">'+fmtMoney(d.estCost||d.totalPayoff)+'</td>'
+      +'<td style="padding:9px 12px;font-size:12px;color:#2e7d32;font-weight:bold;text-align:center;border-bottom:1px solid #eee;">'+(d.estTotalSaved||estTotalSav1)+'</td>'
+      +'</tr>':'')
+    // Est Monthly Payments
+    +'<tr>'
+    +'<td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#1a3a5c;border-right:1px solid #ddd;">Est. Monthly Payments*</td>'
+    +'<td style="padding:9px 12px;font-size:12px;color:#c0392b;text-align:center;border-right:1px solid #ddd;">'+fmtMoney(d.currentPayments)+'</td>'
+    +'<td style="padding:9px 12px;font-size:12px;color:#2e7d32;font-weight:bold;text-align:center;border-right:1px solid #ddd;">'+fmtMoney(d.pay1)+'</td>'
+    +'<td style="padding:9px 12px;font-size:12px;color:#1a3a5c;font-weight:bold;text-align:center;border-right:1px solid #ddd;">'+fmtMoney(d.pay2)+'</td>'
+    +'<td style="padding:9px 12px;font-size:12px;color:#2e7d32;font-weight:bold;text-align:center;">'+(d.estMonthlySaved||d.sav1||'—')+'</td>'
+    +'</tr>'
+    +'</table>'
+    +'<p style="font-size:9px;color:#999;margin:5px 0 12px;">*Estimates based on current path.</p>'
+    // Green proposed terms buttons — BOTH options
+    +'<table width="100%" cellpadding="0" cellspacing="6" border="0"><tr>'
+    +(d.term1?'<td style="background:#4cae4c;border-radius:5px;padding:12px 8px;text-align:center;"><span style="font-size:12px;font-weight:bold;color:#fff;">Option 1: '+d.term1+' Months &nbsp;|&nbsp; '+fmtMoney(d.pay1)+'/mo &nbsp;|&nbsp; Save '+d.sav1+'/mo</span></td>':'')
+    +(d.term1&&d.term2?'<td style="width:8px;"></td>':'')
+    +(d.term2?'<td style="background:#1a7a4a;border-radius:5px;padding:12px 8px;text-align:center;"><span style="font-size:12px;font-weight:bold;color:#fff;">Option 2: '+d.term2+' Months &nbsp;|&nbsp; '+fmtMoney(d.pay2)+'/mo &nbsp;|&nbsp; Save '+d.sav2+'/mo</span></td>':'')
+    +'</tr></table>'
+    +'</td></tr>';
+
+  // Program options table — both options
+  var programSection = !(d.term1||d.term2) ? '' :
+    '<tr><td style="padding:0 30px 14px;">'
+    +'<p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px;">Your Program Options</p>'
+    +'<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;">'
+    +'<tr style="background:#1a3a5c;">'
+    +'<td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Term</td>'
+    +'<td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Monthly Payment</td>'
+    +'<td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Monthly Savings</td>'
+    +'<td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Est. Total Savings*</td>'
+    +'</tr>'
+    +(d.term1?
+      '<tr style="background:#f0faf4;">'
+      +'<td style="padding:10px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;border-bottom:1px solid #eee;">'+d.term1+' months</td>'
+      +'<td style="padding:10px 12px;font-size:14px;font-weight:bold;color:#2e7d32;border-bottom:1px solid #eee;">'+fmtMoney(d.pay1)+'</td>'
+      +'<td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;border-bottom:1px solid #eee;">'+d.sav1+'</td>'
+      +'<td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;border-bottom:1px solid #eee;">'+subtractMoney(d.totalAmountPaid||d.minimumPayments, d.estCost||d.totalPayoff)+'</td>'
+      +'</tr>':'')
+    +(d.term2?
+      '<tr>'
+      +'<td style="padding:10px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;">'+d.term2+' months</td>'
+      +'<td style="padding:10px 12px;font-size:14px;font-weight:bold;color:#2e7d32;">'+fmtMoney(d.pay2)+'</td>'
+      +'<td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;">'+d.sav2+'</td>'
+      +'<td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;">'+subtractMoney(d.totalAmountPaid||d.minimumPayments, d.estCost||d.totalPayoff)+'</td>'
+      +'</tr>':'')
+    +'<tr><td colspan="4" style="padding:6px 12px;font-size:9px;color:#999;">*Est. Total Savings = Total Amount Paid (minimum payments path) minus Estimated Total Cost of program.</td></tr>'
+    +'</table></td></tr>';
+
+  // Payment comparison — both options
+  var payCompSection = !d.currentPayments ? '' :
+    '<tr><td style="padding:0 30px 14px;">'
+    +'<p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px;">How Your Payment Compares</p>'
+    +'<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;">'
+    +'<tr style="background:#1a3a5c;">'
+    +'<td style="padding:8px 12px;font-size:11px;color:white;font-weight:bold;">Payment</td>'
+    +'<td style="padding:8px 12px;font-size:11px;color:white;font-weight:bold;">Amount</td>'
+    +'</tr>'
+    +'<tr><td style="padding:9px 12px;font-size:13px;border-bottom:1px solid #eee;">Current Monthly Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#c0392b;border-bottom:1px solid #eee;">'+fmtMoney(d.currentPayments)+'</td></tr>'
+    +(d.pay1?'<tr style="background:#f0faf4;"><td style="padding:9px 12px;font-size:13px;font-weight:bold;border-bottom:1px solid #eee;">Option 1 — '+d.term1+' Month Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#2e7d32;border-bottom:1px solid #eee;">'+fmtMoney(d.pay1)+(d.sav1?' <span style="font-size:11px;color:#888;">(save '+d.sav1+'/mo)</span>':'')+'</td></tr>':'')
+    +(d.pay2?'<tr><td style="padding:9px 12px;font-size:13px;font-weight:bold;">Option 2 — '+d.term2+' Month Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;">'+fmtMoney(d.pay2)+(d.sav2?' <span style="font-size:11px;color:#888;">(save '+d.sav2+'/mo)</span>':'')+'</td></tr>':'')
+    +'</table></td></tr>';
 
   return '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fff;font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">'
 
@@ -303,13 +422,16 @@ function buildEmail(d) {
   +'<tr><td style="padding:18px 30px 10px;"><p style="font-size:13px;color:#333;margin:0 0 6px;">'+name+',</p><p style="font-size:13px;color:#555;line-height:1.6;margin:0;">Below is a snapshot of your ClearOne Advantage Plan. Your summary includes eligible debts from your credit file and provides a good faith estimate based on your creditors and our actual historical results.</p></td></tr>'
 
   // Plan Highlights
-  +'<tr><td style="padding:14px 30px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#eef3f8;border-radius:6px;"><tr><td style="padding:18px 20px;text-align:center;"><p style="font-size:20px;font-weight:bold;color:#1a3a5c;margin:0 0 6px;">Plan Highlights for '+name+'</p>'+(d.pay1?'<p style="font-size:13px;color:#555;margin:0 0 14px;">Your new plan payment is <strong style="color:#1a3a5c;">'+fmtMoney(d.pay1)+'</strong>'+(d.sav1?' — that\'s <strong>'+d.sav1+'</strong> less than what your creditors expect today':'')+'</p>':'')+'<table width="100%" cellpadding="4" cellspacing="4" border="0"><tr>'+statBoxes+'</tr></table></td></tr></table></td></tr>'
+  +'<tr><td style="padding:14px 30px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#eef3f8;border-radius:6px;"><tr><td style="padding:18px 20px;text-align:center;"><p style="font-size:20px;font-weight:bold;color:#1a3a5c;margin:0 0 6px;">Plan Highlights for '+name+'</p>'+(d.pay1?'<p style="font-size:13px;color:#555;margin:0 0 14px;">Your new plan payment starting at <strong style="color:#1a3a5c;">'+fmtMoney(d.pay1)+'</strong>'+(d.sav1?' — that\'s <strong>'+d.sav1+'</strong> less than what your creditors expect today':'')+'</p>':'')+'<table width="100%" cellpadding="4" cellspacing="4" border="0"><tr>'+statBoxes+'</tr></table></td></tr></table></td></tr>'
+
+  // Individual Summary
+  +summarySection
 
   // Program Options
-  +(d.term1||d.term2?'<tr><td style="padding:0 30px 14px;"><p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px;">Your Program Options</p><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;"><tr style="background:#1a3a5c;"><td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Term</td><td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Monthly Payment</td><td style="padding:9px 12px;font-size:11px;color:white;font-weight:bold;">Monthly Savings</td></tr>'+(d.term1?'<tr style="background:#f0faf4;"><td style="padding:10px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;border-bottom:1px solid #eee;">'+d.term1+' months</td><td style="padding:10px 12px;font-size:14px;font-weight:bold;color:#2e7d32;border-bottom:1px solid #eee;">'+fmtMoney(d.pay1)+'</td><td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;border-bottom:1px solid #eee;">'+d.sav1+'</td></tr>':'')+(d.term2?'<tr><td style="padding:10px 12px;font-size:13px;font-weight:bold;color:#1a3a5c;">'+d.term2+' months</td><td style="padding:10px 12px;font-size:14px;font-weight:bold;color:#2e7d32;">'+fmtMoney(d.pay2)+'</td><td style="padding:10px 12px;font-size:13px;color:#2e7d32;font-weight:bold;">'+d.sav2+'</td></tr>':'')+'</table></td></tr>':'')
+  +programSection
 
-  // Payment Compare
-  +(d.currentPayments?'<tr><td style="padding:0 30px 14px;"><p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 8px;">How Your Payment Compares</p><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ddd;"><tr style="background:#1a3a5c;"><td style="padding:8px 12px;font-size:11px;color:white;font-weight:bold;">Payment</td><td style="padding:8px 12px;font-size:11px;color:white;font-weight:bold;">Amount</td></tr><tr><td style="padding:9px 12px;font-size:13px;border-bottom:1px solid #eee;">Current Monthly Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#c0392b;border-bottom:1px solid #eee;">'+fmtMoney(d.currentPayments)+'</td></tr>'+(d.pay1?'<tr style="background:#f0faf4;"><td style="padding:9px 12px;font-size:13px;font-weight:bold;border-bottom:1px solid #eee;">New ClearOne Program Payment</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#2e7d32;border-bottom:1px solid #eee;">'+fmtMoney(d.pay1)+'</td></tr>':'')+(d.sav1?'<tr><td style="padding:9px 12px;font-size:13px;">Monthly Savings</td><td style="padding:9px 12px;font-size:13px;font-weight:bold;color:#2e7d32;">'+d.sav1+'</td></tr>':'')+'</table></td></tr>':'')
+  // Payment Comparison
+  +payCompSection
 
   // Bar Chart
   +(bars?'<tr><td style="padding:0 30px 14px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d2340;border-radius:6px;"><tr><td style="padding:22px 24px;"><p style="color:#fff;font-size:13px;text-align:center;margin:0 0 20px;">Below shows you how your ClearOne plan compares<br>to other common debt repayment options.</p>'+bars+'</td></tr></table></td></tr>':'')
@@ -322,13 +444,18 @@ function buildEmail(d) {
 
   // Credit Util + Interest Calc
   +'<tr><td style="padding:0 30px 14px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d2340;border-radius:6px;"><tr>'
-  +'<td style="padding:20px;vertical-align:top;width:38%;border-right:1px solid #1e3a5c;text-align:center;"><p style="font-size:11px;color:#aaa;text-transform:uppercase;margin:0 0 10px;">Credit Utilization</p>'
+  +'<td style="padding:20px;vertical-align:top;width:38%;border-right:1px solid #1e3a5c;text-align:center;">'
+  +'<p style="font-size:11px;color:#aaa;text-transform:uppercase;margin:0 0 10px;">Credit Utilization</p>'
   +'<div style="width:100px;height:100px;border-radius:50%;background:conic-gradient('+gcolor+' '+pct+'%, #2a4a6a '+pct+'% 100%);margin:0 auto;display:flex;align-items:center;justify-content:center;">'
-  +'<div style="width:72px;height:72px;background:#0d2340;border-radius:50%;display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-size:16px;font-weight:bold;">'+(d.activeCredit||activeNum+'%')+'</span></div></div>'
+  +'<div style="width:72px;height:72px;background:#0d2340;border-radius:50%;display:flex;align-items:center;justify-content:center;">'
+  +'<span style="color:#fff;font-size:16px;font-weight:bold;">'+(d.activeCredit||activeNum+'%')+'</span>'
+  +'</div></div>'
   +'<p style="font-size:18px;font-weight:bold;color:#fff;margin:10px 0 4px;">POOR</p>'
   +'<p style="font-size:11px;color:#aaa;margin:0;">Remaining: <strong style="color:#fff;">'+(d.remainingCredit||'—')+'</strong></p>'
-  +'<p style="font-size:11px;color:#aaa;margin:3px 0 0;">Active: <strong style="color:#fff;">'+(d.activeCredit||'—')+'</strong></p></td>'
-  +'<td style="padding:20px;vertical-align:top;"><p style="font-size:12px;font-weight:bold;color:#fff;margin:0 0 12px;">Interest Calculator</p>'
+  +'<p style="font-size:11px;color:#aaa;margin:3px 0 0;">Active: <strong style="color:#fff;">'+(d.activeCredit||'—')+'</strong></p>'
+  +'</td>'
+  +'<td style="padding:20px;vertical-align:top;">'
+  +'<p style="font-size:12px;font-weight:bold;color:#fff;margin:0 0 12px;">Interest Calculator</p>'
   +'<table width="100%" cellpadding="0" cellspacing="0" border="0">'
   +'<tr style="background:rgba(255,255,255,0.07);"><td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#dce8f5;">Average Interest Rate</td><td style="padding:9px 12px;font-size:12px;color:#fff;text-align:right;">'+(d.currentInterest||apr+'%')+'</td></tr>'
   +'<tr style="background:rgba(255,255,255,0.13);"><td style="padding:9px 12px;font-size:12px;font-weight:bold;color:#dce8f5;">Current Month\'s Interest</td><td style="padding:9px 12px;font-size:12px;color:#fff;text-align:right;">'+int.mo+'</td></tr>'
@@ -338,7 +465,9 @@ function buildEmail(d) {
   +'</td></tr></table></td></tr>'
 
   // Benefits
-  +'<tr><td style="padding:0 30px 14px;text-align:center;"><p style="font-size:20px;font-weight:bold;color:#1a3a5c;margin:0 0 6px;">Benefits*</p><p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 14px;">Some of the Benefits of This Program Could Include:</p>'
+  +'<tr><td style="padding:0 30px 14px;text-align:center;">'
+  +'<p style="font-size:20px;font-weight:bold;color:#1a3a5c;margin:0 0 6px;">Benefits*</p>'
+  +'<p style="font-size:13px;font-weight:bold;color:#1a3a5c;margin:0 0 14px;">Some of the Benefits of This Program Could Include:</p>'
   +'<table width="100%" cellpadding="0" cellspacing="6" border="0"><tr>'
   +'<td style="width:48%;background:#4cae4c;border-radius:6px;padding:16px;text-align:center;"><p style="font-size:13px;font-weight:bold;color:#fff;margin:0;">One single monthly payment.</p></td>'
   +'<td style="width:4%;"></td>'
